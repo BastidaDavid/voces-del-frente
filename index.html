@@ -28,10 +28,10 @@
     header{
     #infoBtn{
       position:fixed; top:18px; right:18px; width:42px; height:42px; border-radius:50%;
-      background:#000; border:1px solid #3a2f1d; color:#FFD65C; font-size:1.2rem;
-      cursor:pointer; display:grid; place-items:center; box-shadow:0 8px 20px rgba(0,0,0,.4); z-index:2001;
+      background:transparent; border:none; color:#FFD65C; font-size:1.2rem;
+      cursor:pointer; display:grid; place-items:center; z-index:2001;
     }
-    #infoBtn:hover{ background:#111; }
+    #infoBtn:hover{ transform:scale(1.1); }
     #infoDialog::backdrop{ background:rgba(0,0,0,.6); backdrop-filter:blur(2px); }
       position:fixed; top:16px; left:50%; transform:translateX(-50%);
       background:rgba(20,20,20,.65); backdrop-filter: blur(4px);
