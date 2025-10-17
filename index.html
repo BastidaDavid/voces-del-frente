@@ -26,6 +26,13 @@
     .scrim{position:fixed; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.45), rgba(0,0,0,.25) 30%, rgba(0,0,0,.55)); pointer-events:none;}
 
     header{
+    #infoBtn{
+      position:fixed; top:18px; right:18px; width:42px; height:42px; border-radius:50%;
+      background:#000; border:1px solid #3a2f1d; color:#FFD65C; font-size:1.2rem;
+      cursor:pointer; display:grid; place-items:center; box-shadow:0 8px 20px rgba(0,0,0,.4); z-index:2001;
+    }
+    #infoBtn:hover{ background:#111; }
+    #infoDialog::backdrop{ background:rgba(0,0,0,.6); backdrop-filter:blur(2px); }
       position:fixed; top:16px; left:50%; transform:translateX(-50%);
       background:rgba(20,20,20,.65); backdrop-filter: blur(4px);
       padding:8px 16px; border:1px solid #3a2f1d; border-radius:12px; text-align:center;
@@ -142,6 +149,9 @@
     <div class="strap">Entrevista inmersiva — Segunda Guerra Mundial</div>
     <div class="strap">by David Bastida</div>
   </header>
+  <button id="infoBtn" title="Información" aria-label="Información">
+    <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="10" fill="none"/><text x="11" y="16" text-anchor="middle" font-size="14" font-family="Arial, sans-serif" fill="#FFD65C" dominant-baseline="middle">ℹ️</text></svg>
+  </button>
 
   <section id="bio" aria-label="Presentación del personaje">
     <div class="bio-card">
@@ -240,6 +250,14 @@
   }
   </script>
   <script type="module">
+    // Información modal
+    const infoBtn = document.getElementById('infoBtn');
+    const infoDialog = document.getElementById('infoDialog');
+    const closeInfoBtn = document.getElementById('closeInfoBtn');
+    if(infoBtn && infoDialog && closeInfoBtn){
+      infoBtn.addEventListener('click', ()=> infoDialog.showModal());
+      closeInfoBtn.addEventListener('click', ()=> infoDialog.close());
+    }
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -761,3 +779,16 @@
   </script>
 </body>
 </html>
+  <dialog id="infoDialog">
+    <div class="modal-head">
+      <span class="badge">Información</span>
+    </div>
+    <div class="modal-body">
+      <p>Creada por: David Ramírez Bastida</p>
+      <p>Mentor: Guillermo Paredes Otero</p>
+      <p>Universidad Anáhuac Oaxaca</p>
+    </div>
+    <div class="modal-actions">
+      <button class="primary" id="closeInfoBtn">Cerrar</button>
+    </div>
+  </dialog>
