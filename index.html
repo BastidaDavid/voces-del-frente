@@ -136,6 +136,41 @@
     button.primary{background:var(--accent-2); color:#1b1208; border:none; padding:8px 14px; border-radius:10px; cursor:pointer; font-weight:600}
     button.ghost{background:transparent; color:var(--ink); border:1px solid #3a2f1d; padding:8px 14px; border-radius:10px; cursor:pointer}
 
+    /* --- Sección estilo periódico --- */
+    .news{
+      display:block; margin:26px auto 72px; width:min(1200px, 94vw);
+      background:rgba(12,12,12,.72); border:1px solid #3a2f1d; border-radius:18px; color:var(--ink);
+      box-shadow:0 30px 90px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.04);
+      padding:18px 18px 18px; backdrop-filter: blur(3px);
+    }
+    .news-kicker{
+      font-family:"Oswald", sans-serif; text-transform:uppercase; letter-spacing:.12em; color:var(--accent);
+      font-size:.9rem; opacity:.95;
+    }
+    .news-headline{
+      font-family:"Oswald", sans-serif; font-weight:600; letter-spacing:.02em;
+      font-size:1.6rem; margin:6px 0 4px; text-transform:uppercase;
+    }
+    .news-dek{
+      font-size:1rem; opacity:.95; margin-bottom:10px;
+      border-bottom:1px solid #2b2416; padding-bottom:10px;
+    }
+    .news-meta{
+      display:flex; gap:18px; font-size:.85rem; opacity:.85; margin-bottom:10px;
+    }
+    .news-columns{
+      column-count: 2; column-gap: 28px;
+    }
+    .news-columns p{ margin: 0 0 12px; line-height:1.6; }
+    .dropcap::first-letter{
+      float:left; font-family:"Oswald", sans-serif; font-weight:600;
+      font-size:2.4rem; line-height:1; padding-right:6px; color:var(--accent);
+    }
+    .byline{ font-size:.85rem; opacity:.85; }
+    @media (max-width: 900px){
+      .news{ margin:18px auto 54px; }
+      .news-columns{ column-count: 1; }
+    }
     .legend{
       position:fixed; bottom:12px; right:12px; font-size:.8rem; opacity:.8; background:rgba(0,0,0,.45);
       padding:8px 10px; border-radius:10px; border:1px solid #2b2416;
@@ -193,6 +228,31 @@
     </section>
   </main>
 
+  <section class="news" aria-label="El entrevistado — sección estilo periódico">
+    <div class="news-kicker">Perfil</div>
+    <h2 class="news-headline">El entrevistado</h2>
+    <div class="news-dek">Por qué decidimos entrevistarlo</div>
+    <div class="news-meta">
+      <span class="byline">Redacción — Proyecto Voces del Frente</span>
+    </div>
+    <div class="news-columns">
+      <p class="dropcap">
+        Wallace C. Strobel, cuyo semblante inspira a nuestro personaje ficticio, aparece en los preparativos previos al Día&nbsp;D. En esta experiencia, su figura nos permite explorar, con respeto, la memoria de miles de jóvenes que enfrentaron la incertidumbre y el miedo en la Segunda Guerra Mundial.
+      </p>
+      <p>
+        Lo elegimos porque su imagen concentra una tensión humana poderosa: el instante antes de que todo cambie. Ese umbral —entre la calma del bunker y el estruendo allá afuera— abre un territorio narrativo para hablar de responsabilidad, camaradería y el peso de las decisiones.
+      </p>
+      <p>
+        La entrevista busca evitar el espectáculo del combate para enfocarse en lo íntimo: las rutinas, los objetos, las voces y la respiración. El casco que aprieta, la radio que chisporrotea, una carta doblada en el bolsillo; pequeñas anclas para que el recuerdo sea creíble y cercano.
+      </p>
+      <p>
+        También es una oportunidad pedagógica: exponer cómo el periodismo inmersivo puede construir empatía sin glorificar la guerra, usando recursos sonoros, espaciales y una puesta en escena 3D que acompaña —no sustituye— el testimonio.
+      </p>
+      <p>
+        En suma, entrevistarlo —aunque sea a través de un personaje inspirado— nos permite hablar de la paz desde quienes conocieron su fragilidad. Que la audiencia escuche, se sitúe y, sobre todo, se pregunte por las costuras que sostienen la vida en común.
+      </p>
+    </div>
+  </section>
   <div class="legend">Pulsa “Siguiente” para avanzar en la entrevista.</div>
 
   <!-- Mezcla de ambiente: bunker constante + eventos (explosión / balas) -->
