@@ -273,10 +273,7 @@
   <audio id="voz_r4" src="./assets/respuesta4.mp3" preload="auto"></audio>
   <audio id="voz_r5" src="./assets/respuesta5.mp3" preload="auto"></audio>
   <audio id="voz_r6" src="./assets/respuesta6.mp3" preload="auto"></audio>
-  <audio id="voz_r7" preload="auto">
-    <source src="./assets/respuesta7.mp3" type="audio/mpeg">
-    <source src="./assets/Respuesta7.mp3" type="audio/mpeg">
-  </audio>
+  <audio id="voz_r7" src="./assets/respuesta7.mp3" preload="auto"></audio>
 
   <dialog id="audioHint">
     <div class="modal-head">
@@ -326,7 +323,6 @@
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
     const TITLE_LINE = '“Sobrevivir no era una opción… era un acto de fe.”';
-    const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     document.title = `Voces del Frente — ${TITLE_LINE}`;
 
     const QUESTIONS = [
@@ -461,15 +457,64 @@
       ansT.textContent = CHARACTER_NAME;
       ansB.textContent = item.a;
 
-      // --- Reproducir voz SIEMPRE, aunque la animación específica no esté cargada ---
-      playVoiceByIndex(i);
-
-      // --- Animación (si existe) ---
-      const talkName = `talk${i+1}`;
-      if (actions[talkName]) {
-        playOnceThenIdle(talkName, 0.3);
-      } else if (actions.idle) {
-        crossFadeTo('idle', 0.25);
+      // --- Mapeo explícito por índice ---
+      if (i === 0 && actions.talk1) {
+        playOnceThenIdle('talk1', 0.3);
+        const vozR1 = document.getElementById('voz_r1');
+        if (vozR1){ try{ vozR1.pause(); }catch(_){ } vozR1.currentTime = 0; const p = vozR1.play(); if(p && typeof p.catch==='function') p.catch(()=>{}); }
+        ['voz_r2','voz_r3','voz_r4','voz_r5','voz_r6','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (i === 1 && actions.talk2) {
+        playOnceThenIdle('talk2', 0.3);
+        const vozR2 = document.getElementById('voz_r2');
+        if (vozR2){ try{ vozR2.pause(); }catch(_){ } vozR2.currentTime = 0; const p2 = vozR2.play(); if(p2 && typeof p2.catch==='function') p2.catch(()=>{}); }
+        ['voz_r1','voz_r3','voz_r4','voz_r5','voz_r6','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (i === 2 && actions.talk3) {
+        playOnceThenIdle('talk3', 0.3);
+        const vozR3 = document.getElementById('voz_r3');
+        if (vozR3){ try{ vozR3.pause(); }catch(_){ } vozR3.currentTime = 0; const p3 = vozR3.play(); if(p3 && typeof p3.catch==='function') p3.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r4','voz_r5','voz_r6','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (i === 3 && actions.talk4) {
+        playOnceThenIdle('talk4', 0.3);
+        const vozR4 = document.getElementById('voz_r4');
+        if (vozR4){ try{ vozR4.pause(); }catch(_){ } vozR4.currentTime = 0; const p4 = vozR4.play(); if(p4 && typeof p4.catch==='function') p4.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r3','voz_r5','voz_r6','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (i === 4 && actions.talk5) {
+        playOnceThenIdle('talk5', 0.3);
+        const vozR5 = document.getElementById('voz_r5');
+        if (vozR5){ try{ vozR5.pause(); }catch(_){ } vozR5.currentTime = 0; const p5 = vozR5.play(); if(p5 && typeof p5.catch==='function') p5.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r3','voz_r4','voz_r6','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (i === 5 && actions.talk6) {
+        playOnceThenIdle('talk6', 0.3);
+        const vozR6 = document.getElementById('voz_r6');
+        if (vozR6){ try{ vozR6.pause(); }catch(_){ } vozR6.currentTime = 0; const p6 = vozR6.play(); if(p6 && typeof p6.catch==='function') p6.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r3','voz_r4','voz_r5','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (i === 6 && actions.talk7) {
+        playOnceThenIdle('talk7', 0.3);
+        const vozR7 = document.getElementById('voz_r7');
+        if (vozR7){ try{ vozR7.pause(); }catch(_){ } vozR7.currentTime = 0; const p7 = vozR7.play(); if(p7 && typeof p7.catch==='function') p7.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r3','voz_r4','voz_r5','voz_r6'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      // --- Fallbacks por texto (por si cambias el orden de preguntas) ---
+      else if (isRespuesta3(item.a) && actions.talk3) {
+        playOnceThenIdle('talk3', 0.3);
+        const vozR3 = document.getElementById('voz_r3');
+        if (vozR3){ try{ vozR3.pause(); }catch(_){ } vozR3.currentTime = 0; const p3 = vozR3.play(); if(p3 && typeof p3.catch==='function') p3.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r4','voz_r5','voz_r6','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (isRespuesta7(item.a) && actions.talk7) {
+        playOnceThenIdle('talk7', 0.3);
+        const vozR7 = document.getElementById('voz_r7');
+        if (vozR7){ try{ vozR7.pause(); }catch(_){ } vozR7.currentTime = 0; const p7 = vozR7.play(); if(p7 && typeof p7.catch==='function') p7.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r3','voz_r4','voz_r5','voz_r6'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else {
+        if (actions.idle) crossFadeTo('idle', 0.25);
       }
 
       const nb = document.getElementById('nextBtn');
@@ -491,66 +536,6 @@
         const el=document.getElementById(id);
         try{ if(el){ el.pause(); el.currentTime=0; } }catch(_){}
       });
-    }
-
-    function playVoiceByIndex(i){
-      const voiceIds = ['voz_r1','voz_r2','voz_r3','voz_r4','voz_r5','voz_r6','voz_r7'];
-      // Pausa y resetea todas las voces
-      voiceIds.forEach(id=>{
-        const el = document.getElementById(id);
-        if(el){
-          try{ el.pause(); }catch(_){}
-          el.currentTime = 0;
-        }
-      });
-      const id = voiceIds[i];
-      const el = document.getElementById(id);
-      if(!el){ console.warn('⚠️ No se encontró elemento de voz para índice', i+1); return; }
-
-      // Asegurar estado
-      el.muted = false;
-      if (typeof el.volume === 'number') el.volume = Math.min(1, (el.volume || 0.86));
-      // Si aún no tiene datos, forzar carga
-      if (el.readyState === 0) {
-        try { el.load(); } catch(_){}
-      }
-
-      // Logs útiles
-      const url = el.currentSrc || el.src;
-      console.log(`[AUDIO] Intentando reproducir ${id} →`, url, 'readyState=', el.readyState, 'networkState=', el.networkState);
-
-      const legend = document.querySelector('.legend');
-      function showToast(msg){ if(!legend) return; legend.textContent = msg; setTimeout(()=>legend.textContent='Pulsa “Siguiente” para avanzar en la entrevista.', 3500); }
-
-      // Listeners de diagnóstico solo una vez
-      if(!el._dbgBound){
-        el._dbgBound = true;
-        el.addEventListener('loadedmetadata', ()=> console.log(`[AUDIO] ${id} loadedmetadata duration=`, el.duration));
-        el.addEventListener('canplaythrough', ()=> console.log(`[AUDIO] ${id} canplaythrough`));
-        el.addEventListener('stalled', ()=> console.warn(`[AUDIO] ${id} stalled`));
-        el.addEventListener('abort', ()=> console.warn(`[AUDIO] ${id} abort`));
-        el.addEventListener('ended', ()=> console.log(`[AUDIO] ${id} ended`));
-        el.addEventListener('error', ()=>{
-          const err = el.error; const code = err ? err.code : 'unknown';
-          console.error(`[AUDIO] ERROR en ${id} code=`, code, 'src=', url);
-          if(id==='voz_r7') showToast('❌ No se pudo cargar "respuesta7.mp3". Verifica el nombre y ruta en /assets');
-        });
-      }
-
-      // Intentar reproducir
-      try{
-        const p = el.play();
-        if(p && typeof p.then === 'function'){
-          p.then(()=>{
-            if(id==='voz_r7') console.log('[AUDIO] ✅ voz_r7 reproduciendo');
-          }).catch(e=>{
-            console.warn(`[AUDIO] play() rechazado para ${id}:`, e && e.name);
-            showToast('⚠️ Toca la pantalla/da clic y vuelve a intentarlo');
-          });
-        }
-      }catch(e){
-        console.warn(`[AUDIO] Excepción al reproducir ${id}:`, e && e.message);
-      }
     }
 
     function setVoicesVolume(vol = 0.86){
@@ -654,25 +639,18 @@
     let tBalas = null;
     function scheduleBalas(){
       clearTimeout(tBalas);
-      // En móvil, dispara más seguido porque el volumen y altavoces son más bajos
-      const baseMin = IS_MOBILE ? 6000 : 12000;
-      const baseRnd = IS_MOBILE ? 9000 : 14000;
-      const next = baseMin + Math.random() * baseRnd;
-
+      const next = 12000 + Math.random() * 14000;
       tBalas = setTimeout(async () => {
         if (!ambBalas) return scheduleBalas();
-        const bursts = (IS_MOBILE ? 2 : 1) + Math.floor(Math.random() * (IS_MOBILE ? 3 : 2));
+        const bursts = 1 + Math.floor(Math.random()*3);
         for (let i=0;i<bursts;i++){
           try{
             ambBalas.currentTime = 0;
             ambBalas.playbackRate = 0.98 + Math.random() * 0.08;
-            // Subimos volumen en móvil para que sea perceptible en altavoces de celular
-            ambBalas.volume = IS_MOBILE ? 0.10 : 0.02;
-            const p = ambBalas.play();
-            if (p && typeof p.catch === 'function') p.catch(()=>{});
+            ambBalas.volume = 0.005;
+            await ambBalas.play();
           } catch(_) {}
-          // Pausas cortas entre ráfagas
-          await new Promise(r=>setTimeout(r, IS_MOBILE ? (140 + Math.random()*180) : (180 + Math.random()*220)));
+          await new Promise(r=>setTimeout(r, 180 + Math.random()*220));
         }
         scheduleBalas();
       }, next);
@@ -689,35 +667,11 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       setVoicesVolume(0.86);
-      // Chequeo rápido de integridad para respuesta7
-      const v7 = document.getElementById('voz_r7');
-      if(v7){
-        const url7 = v7.currentSrc || v7.src;
-        console.log('[AUDIO] voz_r7 src =', url7);
-        // Si el navegador reporta duración 0 después de intentar cargar, probablemente hay 404 o ruta incorrecta
-        const tryProbe = () => {
-          if (v7.readyState === 0) { try{ v7.load(); }catch(_){} }
-          setTimeout(()=>{
-            if (!isFinite(v7.duration) || v7.duration === 0){
-              const legend = document.querySelector('.legend');
-              if(legend) legend.textContent = '❌ Revisa /assets/respuesta7.mp3 (nombre exacto y minúsculas).';
-              console.warn('[AUDIO] Posible archivo faltante o nombre diferente para respuesta7.mp3');
-            }
-          }, 500);
-        };
-        tryProbe();
-      }
       if (!sessionStorage.getItem('audioHintShown')){
         if (audioHint && typeof audioHint.showModal === 'function') audioHint.showModal();
         else if(audioHint) audioHint.setAttribute('open','');
       }
     });
-    // Utilidad global para establecer mensaje en .legend
-    function setLegend(text){
-      const legend = document.querySelector('.legend');
-      if(!legend) return;
-      legend.textContent = text;
-    }
 
     if (audioOkBtn) audioOkBtn.addEventListener('click', () => {
       sessionStorage.setItem('audioHintShown', '1');
