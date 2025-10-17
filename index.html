@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Voces del Frente — Entrevista Interactiva</title>
+  <meta name="description" content="Entrevista inmersiva con personaje ficticio de la Segunda Guerra Mundial. Página interactiva con 3D, audio y preguntas en órbita." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Special+Elite&display=swap" rel="stylesheet">
+  <style>
+   
+    :root {
+      --accent: #e5b567; /* tono latón */
+      --accent-2: #c96;   /* cobre */
+      --ink: #f3e9d2;     /* papel viejo */
+      --bg-dim: rgba(0,0,0,.55);
+      --ring: rgba(229,181,103,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0; color:var(--ink); font-family:"Special Elite", system-ui, sans-serif; overflow:auto;
+      background: #0b0b0b url('./assets/bg-bunker1.png') center/cover no-repeat fixed;
+    }
+    .scrim{position:fixed; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.45), rgba(0,0,0,.25) 30%, rgba(0,0,0,.55)); pointer-events:none;}
+
+    header{
+      position:fixed; top:16px; left:50%; transform:translateX(-50%);
+      background:rgba(20,20,20,.65); backdrop-filter: blur(4px);
+      padding:8px 16px; border:1px solid #3a2f1d; border-radius:12px; text-align:center;
+      box-shadow:0 8px 30px rgba(0,0,0,.35);
+      z-index: 2000;
+    }
+    h1{margin:0; letter-spacing:.08em; font-family:"Oswald", sans-serif; font-weight:600; text-transform:uppercase; text-shadow: 0 2px 8px rgba(0,0,0,.55);}
+    .strap{font-size:.9rem; opacity:.9}
+
+    .stage{
+      position:relative; display:grid; place-items:center;
+      padding-top:76px; padding-bottom:24px; min-height: calc(100vh - 90px);
+    }
+    #bio{ display:block; margin:140px auto 60px; width:min(1200px, 94vw); }
+    .bio-card{
+      background:rgba(12,12,12,.72); border:1px solid #3a2f1d; border-radius:18px; color:var(--ink);
+      box-shadow:0 30px 90px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.04);
+      padding:18px 18px 16px; backdrop-filter: blur(3px);
+    }
+    .bio-head{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+    .bio-tag{ font-family:"Oswald", sans-serif; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); }
+    .bio-title{ font-family:"Oswald", sans-serif; font-weight:600; letter-spacing:.02em; font-size:1.25rem; }
+    .bio-grid{ display:grid; grid-template-columns: 1.4fr 1fr; gap:18px; }
+    .bio-lead{ line-height:1.6; }
+    .bio-meta{ display:grid; gap:8px; }
+    .meta-row{ display:flex; justify-content:space-between; gap:12px; padding:8px 10px; background:rgba(0,0,0,.35); border:1px solid #2b2416; border-radius:12px; }
+    .meta-label{ opacity:.85; font-family:"Oswald", sans-serif; letter-spacing:.06em; text-transform:uppercase; }
+    .meta-value{ text-align:right; }
+    @media (max-width: 900px){ .bio-grid{ grid-template-columns: 1fr; } }
+
+    #viewport{
+      width:min(1400px, 96vw); height:min(88vh, 920px);
+      border-radius:24px; border:1px solid #2b2416; background:rgba(10,10,10,.4);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.04), 0 30px 80px rgba(0,0,0,.6);
+      position:relative; overflow:hidden;
+      display:grid; grid-template-columns: 1.4fr 1fr; gap:0; align-items:stretch;
+    }
+    #qa{position:relative; overflow:hidden}
+    #viewer{position:relative; overflow:hidden}
+    #viewer canvas{position:absolute; inset:0; width:100%; height:100%}
+    #answerCard{ position:absolute; left:50%; top:9%; transform:translate(-50%,0);
+      width:min(520px, 86%); background:rgba(12,12,12,.72); border:1px solid #3a2f1d; border-radius:16px;
+      box-shadow:0 20px 60px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.04);
+      padding:14px 16px; text-align:left; backdrop-filter: blur(2px);
+    }
+    #answerCard.role-interviewer .answer-title{ color:#7CD1FF; }
+    #answerCard.role-character  .answer-title{ color:var(--accent);}
+    .answer-title{font-family:"Oswald", sans-serif; letter-spacing:.06em; color:var(--accent); margin-bottom:6px}
+    .answer-body{line-height:1.5}
+    @media (max-width: 900px){
+      #viewport{ grid-template-columns: 1fr; height:min(92vh, 1000px);} 
+      #qa{min-height:52vh}
+    }
+
+    .orbit{
+      position:absolute; inset:0; display:grid; place-items:center;
+      pointer-events:none;
+    }
+    .ring{position:absolute; border-radius:50%; border:1px dashed var(--ring);}
+    #radioImg{
+      position:absolute;
+      top:50%; left:50%;
+      transform:translate(-50%, -50%);
+      width:160px;
+      height:auto;
+      filter:drop-shadow(0 4px 10px rgba(0,0,0,.55));
+      opacity:0.95;
+      pointer-events:none;
+    }
+
+    .q{
+      pointer-events:auto; position:absolute; width:76px; height:76px; border-radius:999px;
+      display:grid; place-items:center; text-align:center; padding:8px;
+      background:radial-gradient(120px 120px at 30% 30%, rgba(255,236,179,.18), rgba(0,0,0,.35));
+      border:1px solid rgba(255,210,120,.35);
+      box-shadow:0 10px 25px rgba(0,0,0,.45), inset 0 0 24px rgba(229,181,103,.12);
+      font-size:.75rem; line-height:1.1rem; cursor:pointer;
+      transition:transform .2s ease, box-shadow .2s ease;
+      user-select:none;
+    }
+    .q:hover{transform:translateZ(0) scale(1.06); box-shadow:0 16px 36px rgba(0,0,0,.55), inset 0 0 36px rgba(229,181,103,.22)}
+
+    dialog{border:none; border-radius:18px; padding:0; background:#0c0c0c; color:var(--ink);
+      box-shadow:0 40px 120px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04);
+      width:min(720px, 92vw);
+    }
+    #audioHint{
+      border:2px solid #FFD65C;
+      box-shadow: 0 0 0 3px rgba(255,214,92,.14), 0 36px 120px rgba(0,0,0,.65);
+    }
+    #audioHint .modal-head{
+      background: rgba(255,214,92,.08);
+      border-bottom: 1px solid rgba(255,214,92,.35);
+    }
+    #audioHint .badge{ color:#FFD65C; }
+    #audioHint::backdrop{ background: rgba(0,0,0,.6); backdrop-filter: blur(2px); }
+    .modal-head{display:flex; gap:12px; align-items:center; padding:16px; border-bottom:1px solid #2b2416}
+    .badge{font-family:"Oswald", sans-serif; text-transform:uppercase; letter-spacing:.08em; color:var(--accent)}
+    .modal-body{padding:18px 16px 22px; line-height:1.5}
+    .modal-actions{display:flex; justify-content:flex-end; gap:8px; padding:12px 16px; border-top:1px solid #2b2416}
+    button.primary{background:var(--accent-2); color:#1b1208; border:none; padding:8px 14px; border-radius:10px; cursor:pointer; font-weight:600}
+    button.ghost{background:transparent; color:var(--ink); border:1px solid #3a2f1d; padding:8px 14px; border-radius:10px; cursor:pointer}
+
+    .legend{
+      position:fixed; bottom:12px; right:12px; font-size:.8rem; opacity:.8; background:rgba(0,0,0,.45);
+      padding:8px 10px; border-radius:10px; border:1px solid #2b2416;
+    }
+  </style>
+</head>
+<body>
+  <div class="scrim" aria-hidden="true"></div>
+  <header>
+    <h1>Voces del Frente</h1>
+    <div class="strap">Entrevista inmersiva — Segunda Guerra Mundial</div>
+    <div class="strap">by David Bastida</div>
+  </header>
+
+  <section id="bio" aria-label="Presentación del personaje">
+    <div class="bio-card">
+      <div class="bio-head">
+        <div class="bio-tag">Presentación</div>
+        <div class="bio-title">Wallace C. Strobel — referencia histórica</div>
+      </div>
+      <div class="bio-grid">
+        <p class="bio-lead">
+          Este personaje está <em>inspirado</em> en el paracaidista estadounidense asociado a la foto previa al Día D.
+          En nuestra historia, narra recuerdos con un tono humano y reflexivo: el peso de las decisiones, la camaradería y la dignidad ante el miedo.
+        </p>
+        <div class="bio-meta">
+          <div class="meta-row"><span class="meta-label">Unidad (ficción)</span><span class="meta-value">101st Airborne · Easy Co.</span></div>
+          <div class="meta-row"><span class="meta-label">Rol</span><span class="meta-value">Paracaidista · Testigo de campo</span></div>
+          <div class="meta-row"><span class="meta-label">Tono</span><span class="meta-value">Sobrio, empático, descriptivo</span></div>
+          <div class="meta-row"><span class="meta-label">Elementos</span><span class="meta-value">Radio, casco M1, chaqueta M-1942</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="stage" aria-label="Escenario 3D con preguntas">
+    <section id="viewport" aria-live="polite">
+      <div id="viewer">
+        <canvas id="three"></canvas>
+        <div id="answerCard" aria-live="polite">
+          <div class="answer-title" id="ansTitle">Pregunta</div>
+          <div class="answer-body" id="ansBody">Haz clic en el botón para continuar la entrevista.</div>
+          <button id="nextBtn" class="primary" style="margin-top:8px; display:block;">Siguiente</button>
+        </div>
+      </div>
+      <div id="qa">
+        <div class="orbit" id="orbit">
+          <div class="ring" aria-hidden="true"></div>
+          <img src="./assets/radio.png" alt="radio militar" id="radioImg" />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="legend">Pulsa “Siguiente” para avanzar en la entrevista.</div>
+
+  <!-- Mezcla de ambiente: bunker constante + eventos (explosión / balas) -->
+  <audio id="amb_bunker"    src="./assets/Bunker.wav"    preload="auto" loop></audio>
+  <audio id="amb_explosion" src="./assets/Explotion.wav" preload="auto"></audio>
+  <audio id="amb_balas"     src="./assets/Balas.wav"     preload="auto"></audio>
+  <!-- NUEVO: cama de fondo adicional -->
+  <audio id="amb_bgsonido"  src="./assets/bgsonido.mp3"  preload="auto" loop></audio>
+
+  <!-- Click de radio al abrir pregunta -->
+  <audio id="fx" src="./assets/radio-click.wav" preload="auto"></audio>
+
+  <!-- Voces -->
+  <audio id="voz_r1" src="./assets/respuesta1.mp3" preload="auto"></audio>
+  <audio id="voz_r2" src="./assets/respuesta2.mp3" preload="auto"></audio>
+  <audio id="voz_r3" src="./assets/respuesta3.mp3" preload="auto"></audio>
+  <audio id="voz_r4" src="./assets/respuesta4.mp3" preload="auto"></audio>
+  <audio id="voz_r5" src="./assets/respuesta5.mp3" preload="auto"></audio>
+  <audio id="voz_r6" src="./assets/respuesta6.mp3" preload="auto"></audio>
+  <audio id="voz_r7" src="./assets/respuesta7.mp3" preload="auto"></audio>
+
+  <dialog id="audioHint">
+    <div class="modal-head">
+      <span class="badge">Recomendación</span>
+      <strong>Mejor con audífonos</strong>
+    </div>
+    <div class="modal-body">
+      Para una inmersión total, usa audífonos. ¿Activar el sonido ambiente?
+    </div>
+    <div class="modal-actions">
+      <button class="primary" id="audioOkBtn">OK</button>
+    </div>
+  </dialog>
+
+  <dialog id="modal" style="display:none">
+    <div class="modal-head">
+      <span class="badge">Entrevista</span>
+      <strong id="modalTitle">Pregunta</strong>
+    </div>
+    <div class="modal-body" id="modalBody">
+      Respuesta del personaje…
+    </div>
+    <div class="modal-actions">
+      <button class="ghost" id="copyBtn" title="Copiar respuesta">Copiar</button>
+      <button class="primary" id="closeBtn">Cerrar</button>
+    </div>
+  </dialog>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    const TITLE_LINE = '“Sobrevivir no era una opción… era un acto de fe.”';
+    document.title = `Voces del Frente — ${TITLE_LINE}`;
+
+    const QUESTIONS = [
+      { q: '¿Dónde estás ahora mismo y qué ves a tu alrededor?', a: 'Estoy bajo tierra, la lámpara zumba y la radio escupe estática. Huele a aceite, cuero mojado y metal. Mis manos están negras de ajustar correas.' },
+      { q: '¿Qué sientes cuando aprietas el casco y escuchas la radio?', a: 'El casco me aprieta la frente, me mantiene aquí. La radio cruje: nombres, coordenadas. El miedo se sienta a mi lado, pero no le doy la palabra.' },
+      { q: '¿En qué piensas al mirar a tus compañeros antes de salir?', a: 'En Collins conteniendo la broma en la comisura, en Parker que guarda una foto doblada. Pienso que esta noche todos somos la misma promesa: volver.' },
+      { q: '¿Qué te sostiene ahora que el ruido crece?', a: 'El peso de la tela en los hombros, el ritual de revisar equipo por última vez, y la certeza de que alguien duerme tranquilo si yo avanzo un paso.' },
+      { q: '¿Qué haces con las cartas de casa en este momento?', a: 'Las guardo dentro de la chaqueta. Leo una línea al azar para no olvidar mi voz. Luego las cierro: afuera hablan otras voces.' },
+      { q: 'Si dudas, ¿qué te dices para seguir?', a: 'Respiro. Cuento hasta tres. Me recuerdo que el valor no grita: respira conmigo y pon el pie donde toca.' },
+      { q: 'Si el futuro te escucha por esta radio, ¿qué mensaje envías?', a: 'Que cuiden la paz como cuidamos el paracaídas: revisen las costuras a diario. Y que nadie tenga que aprender a dormir con botas.' }
+    ];
+    const CONTINUOUS_MODE = false;
+    const DIALOGUE_MODE   = true;
+    const INTERVIEWER_NAME = 'Entrevistador';
+    const CHARACTER_NAME   = 'Wallace (Personaje)';
+    const TALK_SPEED = 0.65;
+    const TARGET_R3 = 'en collins conteniendo la broma en la comisura, en parker que guarda una foto doblada. pienso que esta noche todos somos la misma promesa: volver.';
+    const TARGET_R7 = 'que cuiden la paz como cuidamos el paracaídas: revisen las costuras a diario. y que nadie tenga que aprender a dormir con botas.';
+    function isRespuesta3(text){ return (text||'').trim().toLowerCase() === TARGET_R3; }
+    function isRespuesta7(text){ return (text||'').trim().toLowerCase() === TARGET_R7; }
+
+    const orbit = document.getElementById('orbit');
+    let R = 220;
+    function layout(){
+      const host = document.getElementById('qa');
+      const vp = host.getBoundingClientRect();
+      const ringEl = document.querySelector('.ring');
+      const btnSize = 76;
+      const margin = 24;
+
+      const side = Math.min(vp.width, vp.height) - margin*2 - btnSize;
+      const diameter = Math.max(220, side);
+      R = diameter / 2;
+
+      const centerX = vp.width / 2;
+      const centerY = vp.height / 2;
+
+      Object.assign(ringEl.style, {
+        width: `${diameter + btnSize}px`,
+        height: `${diameter + btnSize}px`,
+        left: `${centerX - (diameter + btnSize)/2}px`,
+        top: `${centerY - (diameter + btnSize)/2}px`,
+      });
+
+      orbit.querySelectorAll('button.q').forEach(b=>b.remove());
+      return;
+    }
+    layout();
+    window.addEventListener('resize', layout);
+
+    let qaIndex = -1;
+    let phase = 'idle';
+
+    function setQuestion(i){
+      const ansT = document.getElementById('ansTitle');
+      const ansB = document.getElementById('ansBody');
+      const card = document.getElementById('answerCard');
+      const item = QUESTIONS[i];
+      if(!item) return;
+      stopVoices();
+      card.classList.remove('role-character');
+      card.classList.add('role-interviewer');
+      ansT.textContent = INTERVIEWER_NAME;
+      ansB.textContent = item.q;
+      const nb = document.getElementById('nextBtn');
+      if (nb){ nb.disabled = false; nb.style.visibility = 'visible'; nb.textContent = 'Ver respuesta'; }
+    }
+
+    function showAnswer(i){
+      const ansT = document.getElementById('ansTitle');
+      const ansB = document.getElementById('ansBody');
+      const card = document.getElementById('answerCard');
+      const item = QUESTIONS[i];
+      if(!item) return;
+
+      // audio UI + ducking
+      stopVoices();
+      try{ fx.currentTime = 0; fx.play(); } catch(_){ }
+      if (ambBunker) {
+        fadeAudio(ambBunker, 0.16, 180);
+        setTimeout(()=>fadeAudio(ambBunker, 0.28, 380), 1000);
+      }
+      if (ambBgsonido) {
+        fadeAudio(ambBgsonido, 0.06, 180);
+        setTimeout(()=>fadeAudio(ambBgsonido, 0.12, 380), 1000);
+      }
+
+      // UI: personaje responde
+      card.classList.remove('role-interviewer');
+      card.classList.add('role-character');
+      ansT.textContent = CHARACTER_NAME;
+      ansB.textContent = item.a;
+
+      // --- Mapeo explícito por índice ---
+      if (i === 0 && actions.talk1) {
+        playOnceThenIdle('talk1', 0.3);
+        const vozR1 = document.getElementById('voz_r1');
+        if (vozR1){ try{ vozR1.pause(); }catch(_){ } vozR1.currentTime = 0; const p = vozR1.play(); if(p && typeof p.catch==='function') p.catch(()=>{}); }
+        ['voz_r2','voz_r3','voz_r4','voz_r5','voz_r6','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (i === 1 && actions.talk2) {
+        playOnceThenIdle('talk2', 0.3);
+        const vozR2 = document.getElementById('voz_r2');
+        if (vozR2){ try{ vozR2.pause(); }catch(_){ } vozR2.currentTime = 0; const p2 = vozR2.play(); if(p2 && typeof p2.catch==='function') p2.catch(()=>{}); }
+        ['voz_r1','voz_r3','voz_r4','voz_r5','voz_r6','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (i === 2 && actions.talk3) {
+        playOnceThenIdle('talk3', 0.3);
+        const vozR3 = document.getElementById('voz_r3');
+        if (vozR3){ try{ vozR3.pause(); }catch(_){ } vozR3.currentTime = 0; const p3 = vozR3.play(); if(p3 && typeof p3.catch==='function') p3.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r4','voz_r5','voz_r6','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (i === 3 && actions.talk4) {
+        playOnceThenIdle('talk4', 0.3);
+        const vozR4 = document.getElementById('voz_r4');
+        if (vozR4){ try{ vozR4.pause(); }catch(_){ } vozR4.currentTime = 0; const p4 = vozR4.play(); if(p4 && typeof p4.catch==='function') p4.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r3','voz_r5','voz_r6','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (i === 4 && actions.talk5) {
+        playOnceThenIdle('talk5', 0.3);
+        const vozR5 = document.getElementById('voz_r5');
+        if (vozR5){ try{ vozR5.pause(); }catch(_){ } vozR5.currentTime = 0; const p5 = vozR5.play(); if(p5 && typeof p5.catch==='function') p5.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r3','voz_r4','voz_r6','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (i === 5 && actions.talk6) {
+        playOnceThenIdle('talk6', 0.3);
+        const vozR6 = document.getElementById('voz_r6');
+        if (vozR6){ try{ vozR6.pause(); }catch(_){ } vozR6.currentTime = 0; const p6 = vozR6.play(); if(p6 && typeof p6.catch==='function') p6.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r3','voz_r4','voz_r5','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (i === 6 && actions.talk7) {
+        playOnceThenIdle('talk7', 0.3);
+        const vozR7 = document.getElementById('voz_r7');
+        if (vozR7){ try{ vozR7.pause(); }catch(_){ } vozR7.currentTime = 0; const p7 = vozR7.play(); if(p7 && typeof p7.catch==='function') p7.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r3','voz_r4','voz_r5','voz_r6'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      // --- Fallbacks por texto (por si cambias el orden de preguntas) ---
+      else if (isRespuesta3(item.a) && actions.talk3) {
+        playOnceThenIdle('talk3', 0.3);
+        const vozR3 = document.getElementById('voz_r3');
+        if (vozR3){ try{ vozR3.pause(); }catch(_){ } vozR3.currentTime = 0; const p3 = vozR3.play(); if(p3 && typeof p3.catch==='function') p3.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r4','voz_r5','voz_r6','voz_r7'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else if (isRespuesta7(item.a) && actions.talk7) {
+        playOnceThenIdle('talk7', 0.3);
+        const vozR7 = document.getElementById('voz_r7');
+        if (vozR7){ try{ vozR7.pause(); }catch(_){ } vozR7.currentTime = 0; const p7 = vozR7.play(); if(p7 && typeof p7.catch==='function') p7.catch(()=>{}); }
+        ['voz_r1','voz_r2','voz_r3','voz_r4','voz_r5','voz_r6'].forEach(id=>{ const el=document.getElementById(id); if(el){ try{ el.pause(); }catch(_){ } el.currentTime=0; }});
+      }
+      else {
+        if (actions.idle) crossFadeTo('idle', 0.25);
+      }
+
+      const nb = document.getElementById('nextBtn');
+      if (nb){ nb.disabled = false; nb.style.visibility = 'visible'; nb.textContent = 'Siguiente'; }
+    }
+
+    function nextQA(){
+      qaIndex = (qaIndex + 1) % QUESTIONS.length;
+      setQuestion(qaIndex);
+    }
+
+    function startInterview(){
+      if(!CONTINUOUS_MODE) return;
+      qaIndex = -1; nextQA();
+    }
+
+    function stopVoices(){
+      ['voz_r1','voz_r2','voz_r3','voz_r4','voz_r5','voz_r6','voz_r7'].forEach(id=>{
+        const el=document.getElementById(id);
+        try{ if(el){ el.pause(); el.currentTime=0; } }catch(_){}
+      });
+    }
+
+    function setVoicesVolume(vol = 0.86){
+      ['voz_r1','voz_r2','voz_r3','voz_r4','voz_r5','voz_r6','voz_r7'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.volume = vol;
+      });
+    }
+
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const closeBtn = document.getElementById('closeBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const fx = document.getElementById('fx');
+    const ambBunker    = document.getElementById('amb_bunker');
+    const ambExplosion = document.getElementById('amb_explosion');
+    const ambBalas     = document.getElementById('amb_balas');
+    const ambBgsonido  = document.getElementById('amb_bgsonido');
+
+    function openModal(title, body){
+      const ansT = document.getElementById('ansTitle');
+      const ansB = document.getElementById('ansBody');
+      ansT.textContent = title;
+      ansB.textContent = body;
+      try{ fx.currentTime = 0; fx.play(); } catch(e){}
+      if (ambBunker) {
+        const normal = 0.28;
+        fadeAudio(ambBunker, 0.16, 220);
+        setTimeout(()=> fadeAudio(ambBunker, normal, 420), 1100);
+      }
+      if (ambBgsonido) {
+        const normalBG = 0.12;
+        fadeAudio(ambBgsonido, 0.06, 220);
+        setTimeout(()=> fadeAudio(ambBgsonido, normalBG, 420), 1100);
+      }
+    }
+    closeBtn.addEventListener('click', () => modal.close());
+    modal.addEventListener('click', (e) => {
+      const rect = modal.getBoundingClientRect();
+      const inDialog = rect.top <= e.clientY && e.clientY <= rect.bottom && rect.left <= e.clientX && e.clientX <= rect.right;
+      if(!inDialog) modal.close();
+    });
+    copyBtn.addEventListener('click', async() => {
+      await navigator.clipboard.writeText(modalBody.textContent);
+      copyBtn.textContent = 'Copiado';
+      setTimeout(()=> copyBtn.textContent = 'Copiar', 900);
+    });
+
+    function fadeAudio(el, toVol = 1, ms = 800) {
+      if (!el) return;
+      const from = el.volume ?? 0;
+      const start = performance.now();
+      function step(t) {
+        const k = Math.min(1, (t - start) / ms);
+        el.volume = from + (toVol - from) * k;
+        if (k < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    function startAmbience() {
+      try {
+        if (ambBunker) {
+          ambBunker.volume = 0.0;
+          ambBunker.loop = true;
+          ambBunker.play().then(() => fadeAudio(ambBunker, 0.28, 1500)).catch(()=>{});
+        }
+        if (ambBgsonido) {
+          ambBgsonido.volume = 0.0;
+          ambBgsonido.loop = true;
+          try {
+            const playPromise = ambBgsonido.play();
+            if (playPromise && typeof playPromise.then === 'function') {
+              playPromise.then(() => fadeAudio(ambBgsonido, 0.12, 800)).catch(()=>{});
+            } else {
+              fadeAudio(ambBgsonido, 0.12, 800);
+            }
+          } catch(_) {}
+        }
+        scheduleExplosion();
+        scheduleBalas();
+      } catch(_) {}
+    }
+
+    let tExplosion = null;
+    function scheduleExplosion(){
+      clearTimeout(tExplosion);
+      const next = 18000 + Math.random() * 16000;
+      tExplosion = setTimeout(() => {
+        if (ambExplosion) {
+          ambExplosion.currentTime = 0;
+          ambExplosion.playbackRate = 0.95 + Math.random() * 0.12;
+          ambExplosion.volume = 0.22;
+          ambExplosion.play().catch(()=>{});
+        }
+        scheduleExplosion();
+      }, next);
+    }
+
+    let tBalas = null;
+    function scheduleBalas(){
+      clearTimeout(tBalas);
+      const next = 12000 + Math.random() * 14000;
+      tBalas = setTimeout(async () => {
+        if (!ambBalas) return scheduleBalas();
+        const bursts = 1 + Math.floor(Math.random()*3);
+        for (let i=0;i<bursts;i++){
+          try{
+            ambBalas.currentTime = 0;
+            ambBalas.playbackRate = 0.98 + Math.random() * 0.08;
+            ambBalas.volume = 0.005;
+            await ambBalas.play();
+          } catch(_) {}
+          await new Promise(r=>setTimeout(r, 180 + Math.random()*220));
+        }
+        scheduleBalas();
+      }, next);
+    }
+
+    let ambienceStarted = false;
+    const audioHint = document.getElementById('audioHint');
+    const audioOkBtn = document.getElementById('audioOkBtn');
+
+    const _startAmbience = startAmbience;
+    function safeStartAmbience(){
+      if (ambienceStarted) return; ambienceStarted = true; _startAmbience();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setVoicesVolume(0.86);
+      if (!sessionStorage.getItem('audioHintShown')){
+        if (audioHint && typeof audioHint.showModal === 'function') audioHint.showModal();
+        else if(audioHint) audioHint.setAttribute('open','');
+      }
+    });
+
+    if (audioOkBtn) audioOkBtn.addEventListener('click', () => {
+      sessionStorage.setItem('audioHintShown', '1');
+      if (audioHint) audioHint.close();
+      safeStartAmbience();
+    });
+
+    // Intento de reproducir bgsonido lo antes posible
+    try {
+      if (ambBgsonido) {
+        ambBgsonido.volume = 0.0;
+        ambBgsonido.loop = true;
+        ambBgsonido.play().then(() => fadeAudio(ambBgsonido, 0.12, 1000)).catch(()=>{});
+      }
+    } catch(_) {}
+    window.removeEventListener('pointerdown', startAmbience, { once:true });
+    window.addEventListener('pointerdown', safeStartAmbience, { once:true });
+    if (CONTINUOUS_MODE) window.addEventListener('pointerdown', startInterview, { once:true });
+
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+      stopVoices();
+      if (!ambienceStarted) safeStartAmbience();
+      if (phase === 'idle'){
+        qaIndex = (qaIndex + 1) % QUESTIONS.length;
+        setQuestion(qaIndex);
+        phase = 'q';
+        return;
+      }
+      if (phase === 'q'){
+        showAnswer(qaIndex);
+        phase = 'a';
+        return;
+      }
+      if (phase === 'a'){
+        qaIndex = (qaIndex + 1) % QUESTIONS.length;
+        setQuestion(qaIndex);
+        phase = 'q';
+        return;
+      }
+    });
+
+    const canvas = document.getElementById('three');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    const clock = new THREE.Clock();
+    if (location.protocol === 'file:') {
+      console.warn('Estás abriendo el archivo con file:// — inicia un servidor local para cargar GLB (python3 -m http.server 5500)');
+      const tip = document.createElement('div');
+      tip.textContent = '⚠️ Abre con http:// (no file://). Ejecuta: python3 -m http.server 5500';
+      tip.style.cssText = 'position:fixed;bottom:14px;left:14px;background:#221;padding:8px 10px;border:1px solid #553;border-radius:8px;color:#fce;z-index:9999;font:12px/1.2 system-ui';
+      document.body.appendChild(tip);
+    }
+    const scene = new THREE.Scene();
+    function frameObject(camera, object, fitOffset = 1.2){
+      const box = new THREE.Box3().setFromObject(object);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+
+      const maxSize = Math.max(size.x, size.y, size.z);
+      const fitHeightDistance = maxSize / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
+      const fitWidthDistance = fitHeightDistance / camera.aspect;
+      const distance = fitOffset * Math.max(fitHeightDistance, fitWidthDistance);
+
+      object.position.sub(center);
+      camera.position.set(0, size.y * 0.4, distance);
+      camera.near = distance / 100;
+      camera.far  = distance * 100;
+      camera.updateProjectionMatrix();
+      camera.lookAt(0, size.y * 0.4, 0);
+    }
+    const camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+    camera.position.set(0, 1.4, 3.2);
+
+    const hemi = new THREE.HemisphereLight(0xffe9c0, 0x111111, 1.1); scene.add(hemi);
+    const key = new THREE.DirectionalLight(0xffd6a0, 1.2); key.position.set(2,3,1); scene.add(key);
+    const amb = new THREE.AmbientLight(0xffffff, 0.35);
+    scene.add(amb);
+
+    let mixer = null;
+    const actions = {};
+    let currentAction = null;
+
+    function crossFadeTo(name, fade = 0.25){
+      if(!actions[name]) return;
+      const next = actions[name];
+      next.reset();
+      next.loop = THREE.LoopRepeat;
+      if(currentAction && currentAction !== next){ currentAction.crossFadeTo(next, fade, false); }
+      next.play();
+      currentAction = next;
+    }
+
+    function playOnceThenIdle(name, fade = 0.35){
+      if(!actions[name]) return;
+      if (!currentAction && actions.idle){ actions.idle.reset(); actions.idle.play(); currentAction = actions.idle; }
+
+      const act = actions[name];
+      act.enabled = true;
+      act.reset();
+      act.clampWhenFinished = true;
+      act.loop = THREE.LoopOnce;
+      act.timeScale = name.startsWith('talk') ? TALK_SPEED : 1;
+
+      if(currentAction && currentAction !== act){ currentAction.crossFadeTo(act, fade, false); }
+      act.play();
+
+      const toIdle = () => {
+        mixer.removeEventListener('finished', toIdle);
+        if(actions.idle){ crossFadeTo('idle', 0.3); }
+      };
+      mixer.addEventListener('finished', toIdle);
+
+      currentAction = act;
+    }
+
+    function playForIndex(i){
+      if(!mixer) return;
+      if(i === 0) {
+        playOnceThenIdle('talk1', 0.25);
+        const vozR1 = document.getElementById('voz_r1');
+        if (vozR1) {
+          vozR1.currentTime = 0;
+          vozR1.play().catch(()=>{});
+        }
+        return;
+      }
+      if(i === 1) return playOnceThenIdle('talk2', 0.25);
+      if(actions.idle) crossFadeTo('idle', 0.25);
+    }
+
+    const geo = new THREE.BoxGeometry(0.6,1.2,0.35);
+    const mat = new THREE.MeshStandardMaterial({ color: 0x6a5f4b, roughness:0.8, metalness:0.05 });
+    const dummy = new THREE.Mesh(geo, mat); dummy.position.y = 0.6; scene.add(dummy);
+
+    const loader = new GLTFLoader();
+    loader.load('./assets/personaje.glb', (gltf)=>{
+      const model = gltf.scene;
+      model.traverse(n=>{ if(n.isMesh){ n.castShadow = n.receiveShadow = true; }});
+      scene.remove(dummy);
+      scene.add(model);
+      const boxTmp = new THREE.Box3().setFromObject(model);
+      const diag = boxTmp.getSize(new THREE.Vector3()).length();
+      if (diag > 50) model.scale.setScalar(1);
+      if (diag < 0.5) model.scale.setScalar(6);
+      frameObject(camera, model, 2.45);
+      model.scale.multiplyScalar(0.88);
+      console.log('GLB cargado ✅', {diag});
+      model.position.y -= 4;
+
+      mixer = new THREE.AnimationMixer(model);
+
+      if(gltf.animations && gltf.animations.length){
+        actions.idle = mixer.clipAction(gltf.animations[0]);
+        actions.idle.play();
+        currentAction = actions.idle;
+      }
+
+      const gltfLoader2 = new GLTFLoader();
+      gltfLoader2.load('./assets/Talk1.glb', (g)=>{
+        if(g.animations && g.animations[0]){ actions.talk1 = mixer.clipAction(g.animations[0]); actions.talk1.enabled = true; }
+      });
+      gltfLoader2.load('./assets/Talk2.glb', (g)=>{
+        if(g.animations && g.animations[0]){ actions.talk2 = mixer.clipAction(g.animations[0]); actions.talk2.enabled = true; }
+      });
+      gltfLoader2.load('./assets/Talk3.glb', (g)=>{
+        if(g.animations && g.animations[0]){ actions.talk3 = mixer.clipAction(g.animations[0]); actions.talk3.enabled = true; }
+      });
+      gltfLoader2.load('./assets/Talk4.glb', (g)=>{
+        if(g.animations && g.animations[0]){ actions.talk4 = mixer.clipAction(g.animations[0]); actions.talk4.enabled = true; }
+      });
+      gltfLoader2.load('./assets/Talk5.glb', (g)=>{
+        if(g.animations && g.animations[0]){ actions.talk5 = mixer.clipAction(g.animations[0]); actions.talk5.enabled = true; }
+      });
+      gltfLoader2.load('./assets/Talk6.glb', (g)=>{
+        if(g.animations && g.animations[0]){ actions.talk6 = mixer.clipAction(g.animations[0]); actions.talk6.enabled = true; }
+      });
+      gltfLoader2.load('./assets/Talk7.glb', (g)=>{
+        if(g.animations && g.animations[0]){ actions.talk7 = mixer.clipAction(g.animations[0]); actions.talk7.enabled = true; }
+      });
+    }, undefined, (err)=>{
+      console.error('No se pudo cargar ./assets/personaje.glb', err);
+      const tip = document.createElement('div');
+      tip.textContent = '❌ Error cargando personaje.glb — revisa que exista en /assets y abre con http://';
+      tip.style.cssText = 'position:fixed;top:14px;left:14px;background:#311;padding:8px 10px;border:1px solid #833;border-radius:8px;color:#fee;z-index:9999;font:12px/1.2 system-ui';
+      document.body.appendChild(tip);
+    });
+
+    function resize(){
+      const host = document.getElementById('viewer');
+      const w = host.clientWidth, h = host.clientHeight;
+      if(renderer.domElement.width !== w || renderer.domElement.height !== h){
+        renderer.setSize(w, h, false);
+        camera.aspect = w/h; camera.updateProjectionMatrix();
+      }
+    }
+    function render(){ resize(); dummy.scale.y = 1 + Math.sin(performance.now()/900)*0.03; renderer.render(scene, camera); }
+    renderer.setAnimationLoop(()=>{
+      const dt = clock.getDelta();
+      if(mixer) mixer.update(dt);
+      render();
+    });
+
+    let targetRot = 0, rot = 0;
+    const canvasEl = canvas;
+    canvasEl.addEventListener('pointermove', (e)=>{ const pct = (e.clientX / window.innerWidth) - 0.5; targetRot = pct * 0.35; });
+    setInterval(()=>{ rot += (targetRot - rot) * 0.06; scene.rotation.y = rot; }, 16);
+  </script>
+</body>
+</html>
