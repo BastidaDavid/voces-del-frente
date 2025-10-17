@@ -495,14 +495,59 @@
       // Pausa y resetea todas las voces
       voiceIds.forEach(id=>{
         const el = document.getElementById(id);
-        if(el){ try{ el.pause(); }catch(_){} el.currentTime = 0; }
+        if(el){
+          try{ el.pause(); }catch(_){}
+          el.currentTime = 0;
+        }
       });
-      const el = document.getElementById(voiceIds[i]);
+      const id = voiceIds[i];
+      const el = document.getElementById(id);
       if(!el){ console.warn('⚠️ No se encontró elemento de voz para índice', i+1); return; }
+
+      // Asegurar estado
+      el.muted = false;
+      if (typeof el.volume === 'number') el.volume = Math.min(1, (el.volume || 0.86));
+      // Si aún no tiene datos, forzar carga
+      if (el.readyState === 0) {
+        try { el.load(); } catch(_){}
+      }
+
+      // Logs útiles
+      const url = el.currentSrc || el.src;
+      console.log(`[AUDIO] Intentando reproducir ${id} →`, url, 'readyState=', el.readyState, 'networkState=', el.networkState);
+
+      const legend = document.querySelector('.legend');
+      function showToast(msg){ if(!legend) return; legend.textContent = msg; setTimeout(()=>legend.textContent='Pulsa “Siguiente” para avanzar en la entrevista.', 3500); }
+
+      // Listeners de diagnóstico solo una vez
+      if(!el._dbgBound){
+        el._dbgBound = true;
+        el.addEventListener('loadedmetadata', ()=> console.log(`[AUDIO] ${id} loadedmetadata duration=`, el.duration));
+        el.addEventListener('canplaythrough', ()=> console.log(`[AUDIO] ${id} canplaythrough`));
+        el.addEventListener('stalled', ()=> console.warn(`[AUDIO] ${id} stalled`));
+        el.addEventListener('abort', ()=> console.warn(`[AUDIO] ${id} abort`));
+        el.addEventListener('ended', ()=> console.log(`[AUDIO] ${id} ended`));
+        el.addEventListener('error', ()=>{
+          const err = el.error; const code = err ? err.code : 'unknown';
+          console.error(`[AUDIO] ERROR en ${id} code=`, code, 'src=', url);
+          if(id==='voz_r7') showToast('❌ No se pudo cargar "respuesta7.mp3". Verifica el nombre y ruta en /assets');
+        });
+      }
+
+      // Intentar reproducir
       try{
         const p = el.play();
-        if(p && typeof p.catch === 'function') p.catch(()=>{});
-      }catch(_){}
+        if(p && typeof p.then === 'function'){
+          p.then(()=>{
+            if(id==='voz_r7') console.log('[AUDIO] ✅ voz_r7 reproduciendo');
+          }).catch(e=>{
+            console.warn(`[AUDIO] play() rechazado para ${id}:`, e && e.name);
+            showToast('⚠️ Toca la pantalla/da clic y vuelve a intentarlo');
+          });
+        }
+      }catch(e){
+        console.warn(`[AUDIO] Excepción al reproducir ${id}:`, e && e.message);
+      }
     }
 
     function setVoicesVolume(vol = 0.86){
@@ -641,11 +686,35 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       setVoicesVolume(0.86);
+      // Chequeo rápido de integridad para respuesta7
+      const v7 = document.getElementById('voz_r7');
+      if(v7){
+        const url7 = v7.currentSrc || v7.src;
+        console.log('[AUDIO] voz_r7 src =', url7);
+        // Si el navegador reporta duración 0 después de intentar cargar, probablemente hay 404 o ruta incorrecta
+        const tryProbe = () => {
+          if (v7.readyState === 0) { try{ v7.load(); }catch(_){} }
+          setTimeout(()=>{
+            if (!isFinite(v7.duration) || v7.duration === 0){
+              const legend = document.querySelector('.legend');
+              if(legend) legend.textContent = '❌ Revisa /assets/respuesta7.mp3 (nombre exacto y minúsculas).';
+              console.warn('[AUDIO] Posible archivo faltante o nombre diferente para respuesta7.mp3');
+            }
+          }, 500);
+        };
+        tryProbe();
+      }
       if (!sessionStorage.getItem('audioHintShown')){
         if (audioHint && typeof audioHint.showModal === 'function') audioHint.showModal();
         else if(audioHint) audioHint.setAttribute('open','');
       }
     });
+    // Utilidad global para establecer mensaje en .legend
+    function setLegend(text){
+      const legend = document.querySelector('.legend');
+      if(!legend) return;
+      legend.textContent = text;
+    }
 
     if (audioOkBtn) audioOkBtn.addEventListener('click', () => {
       sessionStorage.setItem('audioHintShown', '1');
