@@ -26,19 +26,19 @@
     .scrim{position:fixed; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.45), rgba(0,0,0,.25) 30%, rgba(0,0,0,.55)); pointer-events:none;}
 
     header{
+    #infoBtn{
+      position:fixed; top:18px; right:18px; width:42px; height:42px; border-radius:50%;
+      background:transparent; border:none; color:#FFD65C; font-size:1.2rem;
+      cursor:pointer; display:grid; place-items:center; z-index:2001;
+    }
+    #infoBtn:hover{ transform:scale(1.1); }
+    #infoDialog::backdrop{ background:rgba(0,0,0,.6); backdrop-filter:blur(2px); }
       position:fixed; top:16px; left:50%; transform:translateX(-50%);
       background:rgba(20,20,20,.65); backdrop-filter: blur(4px);
       padding:8px 16px; border:1px solid #3a2f1d; border-radius:12px; text-align:center;
       box-shadow:0 8px 30px rgba(0,0,0,.35);
       z-index: 2000;
     }
-#infoBtn{
-  position:fixed; top:18px; right:18px; width:42px; height:42px; border-radius:50%;
-  background:transparent; border:none; color:#FFD65C; font-size:1.2rem;
-  cursor:pointer; display:grid; place-items:center; z-index:2001;
-}
-#infoBtn:hover{ transform:scale(1.1); }
-#infoDialog::backdrop{ background:rgba(0,0,0,.6); backdrop-filter:blur(2px); }
     h1{margin:0; letter-spacing:.08em; font-family:"Oswald", sans-serif; font-weight:600; text-transform:uppercase; text-shadow: 0 2px 8px rgba(0,0,0,.55);}
     .strap{font-size:.9rem; opacity:.9}
 
@@ -72,7 +72,7 @@
     }
     #qa{position:relative; overflow:hidden}
     #viewer{position:relative; overflow:hidden}
-    #viewer canvas{position:absolute; inset:0; width:100%; height:100%; z-index:3; pointer-events:auto}
+    #viewer canvas{position:absolute; inset:0; width:100%; height:100%; z-index:3; pointer-events:none}
     #answerCard{ position:absolute; left:50%; top:9%; transform:translate(-50%,0);
       width:min(520px, 86%); background:rgba(12,12,12,.72); border:1px solid #3a2f1d; border-radius:16px;
       box-shadow:0 20px 60px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.04);
@@ -171,18 +171,6 @@
     @media (max-width: 900px){
       .news{ margin:18px auto 54px; }
       .news-columns{ column-count: 1; }
-    }
-
-    @media (max-width: 600px){
-      .stage{ padding-top:88px; min-height:auto; }
-      #viewport{ grid-template-columns: 1fr; height:min(92dvh, 1000px); }
-      #qa{ min-height: 50dvh; }
-      #answerCard{ top:6%; width:min(92vw, 520px); }
-      .q{ width:64px; height:64px; font-size:.72rem; }
-      #radioImg{ width:120px; }
-      button.primary{ padding:12px 16px; font-size:1rem; }
-      .news{ width:94vw; margin:18px auto 60px; }
-      .news-columns{ column-count:1; }
     }
     .legend{
       position:fixed; bottom:12px; right:12px; font-size:.8rem; opacity:.8; background:rgba(0,0,0,.45);
@@ -845,24 +833,10 @@
       render();
     });
 
-    let targetRot = 0, rot = 0, dragging = false, lastX = 0;
+    let targetRot = 0, rot = 0;
     const canvasEl = canvas;
-
-    function applyRotation(){
-      rot += (targetRot - rot) * 0.08; // suavizado
-      scene.rotation.y = rot;
-      requestAnimationFrame(applyRotation);
-    }
-    requestAnimationFrame(applyRotation);
-
-    canvasEl.addEventListener('pointerdown', (e)=>{
-      dragging = true; lastX = e.clientX; canvasEl.setPointerCapture(e.pointerId);
-    });
-    canvasEl.addEventListener('pointermove', (e)=>{
-      if(!dragging) return; const dx = e.clientX - lastX; lastX = e.clientX; targetRot += dx * 0.005;
-    });
-    canvasEl.addEventListener('pointerup',   ()=>{ dragging = false; });
-    canvasEl.addEventListener('pointercancel',()=>{ dragging = false; });
+    canvasEl.addEventListener('pointermove', (e)=>{ const pct = (e.clientX / window.innerWidth) - 0.5; targetRot = pct * 0.35; });
+    setInterval(()=>{ rot += (targetRot - rot) * 0.06; scene.rotation.y = rot; }, 16);
   </script>
 </body>
 </html>
