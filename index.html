@@ -72,7 +72,7 @@
     }
     #qa{position:relative; overflow:hidden}
     #viewer{position:relative; overflow:hidden}
-    #viewer canvas{position:absolute; inset:0; width:100%; height:100%; z-index:3; pointer-events:none}
+    #viewer canvas{position:absolute; inset:0; width:100%; height:100%; z-index:3; pointer-events:auto}
     #answerCard{ position:absolute; left:50%; top:9%; transform:translate(-50%,0);
       width:min(520px, 86%); background:rgba(12,12,12,.72); border:1px solid #3a2f1d; border-radius:16px;
       box-shadow:0 20px 60px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.04);
@@ -171,6 +171,9 @@
     @media (max-width: 900px){
       .news{ margin:18px auto 54px; }
       .news-columns{ column-count: 1; }
+    }
+    @media (max-width: 600px){
+      #viewport{ height: 92dvh; }
     }
     .legend{
       position:fixed; bottom:12px; right:12px; font-size:.8rem; opacity:.8; background:rgba(0,0,0,.45);
@@ -675,6 +678,7 @@
 
     const canvas = document.getElementById('three');
     const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     const clock = new THREE.Clock();
     if (location.protocol === 'file:') {
       console.warn('Estás abriendo el archivo con file:// — inicia un servidor local para cargar GLB (python3 -m http.server 5500)');
