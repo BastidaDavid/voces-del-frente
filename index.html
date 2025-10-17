@@ -273,10 +273,7 @@
   <audio id="voz_r4" src="./assets/respuesta4.mp3" preload="auto"></audio>
   <audio id="voz_r5" src="./assets/respuesta5.mp3" preload="auto"></audio>
   <audio id="voz_r6" src="./assets/respuesta6.mp3" preload="auto"></audio>
-  <audio id="voz_r7" preload="auto">
-    <source src="./assets/respuesta7.mp3" type="audio/mpeg">
-    <source src="./assets/Respuesta7.mp3" type="audio/mpeg">
-  </audio>
+  <audio id="voz_r7" src="./assets/respuesta7.mp3" preload="auto"></audio>
 
   <dialog id="audioHint">
     <div class="modal-head">
@@ -643,24 +640,25 @@
     let tBalas = null;
     function scheduleBalas(){
       clearTimeout(tBalas);
-      // En móvil: menos frecuente y más bajo
-      const baseMin = IS_MOBILE ? 9000 : 12000;
-      const baseRnd = IS_MOBILE ? 14000 : 14000;
+      // En móvil, dispara más seguido porque el volumen y altavoces son más bajos
+      const baseMin = IS_MOBILE ? 6000 : 12000;
+      const baseRnd = IS_MOBILE ? 9000 : 14000;
       const next = baseMin + Math.random() * baseRnd;
 
       tBalas = setTimeout(async () => {
         if (!ambBalas) return scheduleBalas();
-        const bursts = (IS_MOBILE ? 1 : 1) + Math.floor(Math.random() * (IS_MOBILE ? 2 : 2));
+        const bursts = (IS_MOBILE ? 2 : 1) + Math.floor(Math.random() * (IS_MOBILE ? 3 : 2));
         for (let i=0;i<bursts;i++){
           try{
             ambBalas.currentTime = 0;
             ambBalas.playbackRate = 0.98 + Math.random() * 0.08;
-            // Volumen más bajo en móvil para no saturar
-            ambBalas.volume = IS_MOBILE ? 0.04 : 0.02;
+            // Subimos volumen en móvil para que sea perceptible en altavoces de celular
+            ambBalas.volume = IS_MOBILE ? 0.10 : 0.02;
             const p = ambBalas.play();
             if (p && typeof p.catch === 'function') p.catch(()=>{});
           } catch(_) {}
-          await new Promise(r=>setTimeout(r, IS_MOBILE ? (180 + Math.random()*220) : (180 + Math.random()*220)));
+          // Pausas cortas entre ráfagas
+          await new Promise(r=>setTimeout(r, IS_MOBILE ? (140 + Math.random()*180) : (180 + Math.random()*220)));
         }
         scheduleBalas();
       }, next);
