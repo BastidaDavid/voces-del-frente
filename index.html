@@ -323,6 +323,7 @@
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
     const TITLE_LINE = '“Sobrevivir no era una opción… era un acto de fe.”';
+    const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     document.title = `Voces del Frente — ${TITLE_LINE}`;
 
     const QUESTIONS = [
@@ -639,18 +640,25 @@
     let tBalas = null;
     function scheduleBalas(){
       clearTimeout(tBalas);
-      const next = 12000 + Math.random() * 14000;
+      // En móvil, dispara más seguido porque el volumen y altavoces son más bajos
+      const baseMin = IS_MOBILE ? 6000 : 12000;
+      const baseRnd = IS_MOBILE ? 9000 : 14000;
+      const next = baseMin + Math.random() * baseRnd;
+
       tBalas = setTimeout(async () => {
         if (!ambBalas) return scheduleBalas();
-        const bursts = 1 + Math.floor(Math.random()*3);
+        const bursts = (IS_MOBILE ? 2 : 1) + Math.floor(Math.random() * (IS_MOBILE ? 3 : 2));
         for (let i=0;i<bursts;i++){
           try{
             ambBalas.currentTime = 0;
             ambBalas.playbackRate = 0.98 + Math.random() * 0.08;
-            ambBalas.volume = 0.005;
-            await ambBalas.play();
+            // Subimos volumen en móvil para que sea perceptible en altavoces de celular
+            ambBalas.volume = IS_MOBILE ? 0.10 : 0.02;
+            const p = ambBalas.play();
+            if (p && typeof p.catch === 'function') p.catch(()=>{});
           } catch(_) {}
-          await new Promise(r=>setTimeout(r, 180 + Math.random()*220));
+          // Pausas cortas entre ráfagas
+          await new Promise(r=>setTimeout(r, IS_MOBILE ? (140 + Math.random()*180) : (180 + Math.random()*220)));
         }
         scheduleBalas();
       }, next);
