@@ -346,38 +346,7 @@
 
     const orbit = document.getElementById('orbit');
     let R = 220;
-
-    function ensureQuestionButtons(){
-      // Si ya existen, no los recrees
-      if (orbit.querySelectorAll('button.q').length === QUESTIONS.length) return;
-      // Limpia cualquier sobrante anterior
-      orbit.querySelectorAll('button.q').forEach(b=>b.remove());
-
-      // Crea un botón por pregunta
-      QUESTIONS.forEach((item, i)=>{
-        const b = document.createElement('button');
-        b.className = 'q';
-        b.type = 'button';
-        b.textContent = String(i+1);
-        b.setAttribute('aria-label', `Pregunta ${i+1}: ${item.q}`);
-        b.addEventListener('click', ()=>{
-          // Al hacer clic: si no estaba seleccionada, muestra la pregunta; si ya estaba, muestra la respuesta
-          if (qaIndex !== i || phase !== 'q') {
-            qaIndex = i;
-            setQuestion(i);
-            phase = 'q';
-          } else {
-            showAnswer(i);
-            phase = 'a';
-          }
-        });
-        orbit.appendChild(b);
-      });
-    }
-
     function layout(){
-      ensureQuestionButtons();
-
       const host = document.getElementById('qa');
       const vp = host.getBoundingClientRect();
       const ringEl = document.querySelector('.ring');
@@ -398,19 +367,9 @@
         top: `${centerY - (diameter + btnSize)/2}px`,
       });
 
-      // Distribuye los botones en círculo
-      const n = QUESTIONS.length;
-      const start = -Math.PI / 2; // inicia arriba
-      const buttons = orbit.querySelectorAll('button.q');
-      buttons.forEach((b, i)=>{
-        const ang = start + i * (2*Math.PI / n);
-        const x = centerX + R * Math.cos(ang) - btnSize/2;
-        const y = centerY + R * Math.sin(ang) - btnSize/2;
-        b.style.left = `${x}px`;
-        b.style.top  = `${y}px`;
-      });
+      orbit.querySelectorAll('button.q').forEach(b=>b.remove());
+      return;
     }
-
     layout();
     window.addEventListener('resize', layout);
 
