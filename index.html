@@ -653,7 +653,7 @@
             ambBalas.currentTime = 0;
             ambBalas.playbackRate = 0.98 + Math.random() * 0.08;
             // Subimos volumen en móvil para que sea perceptible en altavoces de celular
-            ambBalas.volume = IS_MOBILE ? 0.10 : 0.02;
+            ambBalas.volume = IS_MOBILE ? 0.035 : 0.012;
             const p = ambBalas.play();
             if (p && typeof p.catch === 'function') p.catch(()=>{});
           } catch(_) {}
