@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Voces del Frente — Entrevista Interactiva</title>
-  <meta name="description" content="Entrevista inmersiva con personaje ficticio de la Segunda Guerra Mundial. Página interactiva con 3D, audio y preguntas en órbita." />
+  <title>Voices from the Front — Interactive Interview</title>
+  <meta name="description" content="Immersive interview with a fictional World War II character. Interactive page with 3D, audio, and orbiting questions." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Special+Elite&display=swap" rel="stylesheet">
@@ -181,80 +181,82 @@
 <body>
   <div class="scrim" aria-hidden="true"></div>
   <header>
-    <h1>Voces del Frente</h1>
-    <div class="strap">Entrevista inmersiva — Segunda Guerra Mundial</div>
+    <h1>Voices from the Front</h1>
+    <div class="strap">Immersive Interview — World War II</div>
     <div class="strap">by David Bastida</div>
   </header>
-  <button id="infoBtn" title="Información" aria-label="Información">
+  <button id="infoBtn" title="Information" aria-label="Information">
     <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="10" fill="none"/><text x="11" y="16" text-anchor="middle" font-size="14" font-family="Arial, sans-serif" fill="#FFD65C" dominant-baseline="middle">ℹ️</text></svg>
   </button>
-
-  <section id="bio" aria-label="Presentación del personaje">
+  <button id="soundToggleBtn" title="Mute or unmute all audio" aria-label="Mute or unmute all audio" style="position:fixed;top:18px;right:70px;z-index:2002;background:rgba(20,20,20,.65);border:1px solid #3a2f1d;border-radius:12px;padding:6px 16px;color:#FFD65C;font-size:.98rem;cursor:pointer;font-family:'Special Elite',system-ui,sans-serif;">
+    🔊 Sound On
+  </button>
+  <section id="bio" aria-label="Character Introduction">
     <div class="bio-card">
       <div class="bio-head">
-        <div class="bio-tag">Presentación</div>
-        <div class="bio-title">Wallace C. Strobel — referencia histórica</div>
+        <div class="bio-tag">Introduction</div>
+        <div class="bio-title">Wallace C. Strobel — historical reference</div>
       </div>
       <div class="bio-grid">
         <p class="bio-lead">
-          Este personaje está <em>inspirado</em> en el paracaidista estadounidense asociado a la foto previa al Día D.
-          En nuestra historia, narra recuerdos con un tono humano y reflexivo: el peso de las decisiones, la camaradería y la dignidad ante el miedo.
+          This character is <em>inspired</em> by the American paratrooper associated with the pre-D-Day photo.
+          In our story, he narrates memories with a human and reflective tone: the weight of decisions, camaraderie, and dignity in the face of fear.
         </p>
         <div class="bio-meta">
-          <div class="meta-row"><span class="meta-label">Unidad (ficción)</span><span class="meta-value">101st Airborne · Easy Co.</span></div>
-          <div class="meta-row"><span class="meta-label">Rol</span><span class="meta-value">Paracaidista · Testigo de campo</span></div>
-          <div class="meta-row"><span class="meta-label">Tono</span><span class="meta-value">Sobrio, empático, descriptivo</span></div>
-          <div class="meta-row"><span class="meta-label">Elementos</span><span class="meta-value">Radio, casco M1, chaqueta M-1942</span></div>
+          <div class="meta-row"><span class="meta-label">Unit (fiction)</span><span class="meta-value">101st Airborne · Easy Co.</span></div>
+          <div class="meta-row"><span class="meta-label">Role</span><span class="meta-value">Paratrooper · Field witness</span></div>
+          <div class="meta-row"><span class="meta-label">Tone</span><span class="meta-value">Solemn, empathetic, descriptive</span></div>
+          <div class="meta-row"><span class="meta-label">Elements</span><span class="meta-value">Radio, M1 helmet, M-1942 jacket</span></div>
         </div>
       </div>
     </div>
   </section>
 
-  <main class="stage" aria-label="Escenario 3D con preguntas">
+  <main class="stage" aria-label="3D Scene with Questions">
     <section id="viewport" aria-live="polite">
       <div id="viewer">
         <canvas id="three"></canvas>
         <div id="answerCard" aria-live="polite">
-          <div class="answer-title" id="ansTitle">Pregunta</div>
-          <div class="answer-body" id="ansBody">Haz clic en el botón para continuar la entrevista.</div>
-          <button id="nextBtn" class="primary" style="margin-top:8px; display:block;">Siguiente</button>
+          <div class="answer-title" id="ansTitle">Question</div>
+          <div class="answer-body" id="ansBody">Click the button to continue the interview.</div>
+          <button id="nextBtn" class="primary" style="margin-top:8px; display:block;">Next</button>
         </div>
       </div>
       <div id="qa">
         <div class="orbit" id="orbit">
           <div class="ring" aria-hidden="true"></div>
-          <img src="./assets/radio.png" alt="radio militar" id="radioImg" />
+          <img src="./assets/radio.png" alt="military radio" id="radioImg" />
         </div>
       </div>
     </section>
   </main>
 
-  <section class="news" aria-label="El entrevistado — sección estilo periódico">
-    <div class="news-kicker">Perfil</div>
+  <section class="news" aria-label="The Interviewee — Newspaper-style Section">
+    <div class="news-kicker">Profile</div>
     <h2 class="news-headline">Wallace C. Strobel</h2>
-    <div class="news-dek">Noticia 101ª División Aeronada </div>
+    <div class="news-dek">101st Airborne Division News</div>
     <div class="news-meta">
-      <span class="byline">2 de junio de 1944</span>
+      <span class="byline">June 2, 1944</span>
     </div>
     <div class="news-columns">
       <p class="dropcap">
-        Wallace C. Strobel, cuyo semblante inspira a nuestro personaje ficticio, aparece en los preparativos previos al Día&nbsp;D. En esta experiencia, su figura nos permite explorar, con respeto, la memoria de miles de jóvenes que enfrentaron la incertidumbre y el miedo en la Segunda Guerra Mundial.
+        Wallace C. Strobel, whose face inspires our fictional character, appears in the preparations before D-Day. In this experience, his figure allows us to respectfully explore the memory of thousands of young people who faced uncertainty and fear in World War II.
       </p>
       <p>
-        Su imagen concentra una tensión humana poderosa: el instante antes de que todo cambie. Ese umbral —entre la calma del bunker y el estruendo allá afuera— abre un territorio narrativo para hablar de responsabilidad, camaradería y el peso de las decisiones.
+        His image captures a powerful human tension: the moment before everything changes. That threshold — between the calm of the bunker and the roar outside — opens a narrative territory to talk about responsibility, camaraderie, and the weight of decisions.
       </p>
       <p>
-        La entrevista busca evitar el espectáculo del combate para enfocarse en lo íntimo: las rutinas, los objetos, las voces y la respiración. El casco que aprieta, la radio que chisporrotea, una carta doblada en el bolsillo; pequeñas anclas para que el recuerdo sea creíble y cercano.
+        The interview seeks to avoid the spectacle of combat to focus on the intimate: routines, objects, voices, and breathing. The helmet pressing, the crackling radio, a folded letter in the pocket; small anchors so that the memory is believable and close.
       </p>
       <p>
-        También es una oportunidad pedagógica: exponer cómo el periodismo inmersivo puede construir empatía sin glorificar la guerra, usando recursos sonoros, espaciales y una puesta en escena 3D que acompaña —no sustituye— el testimonio.
+        It is also a pedagogical opportunity: to show how immersive journalism can build empathy without glorifying war, using sound, spatial resources, and a 3D staging that accompanies — but does not replace — the testimony.
       </p>
       <p>
-        En suma, entrevistarlo —aunque sea a través de un personaje inspirado— nos permite hablar de la paz desde quienes conocieron su fragilidad. Que la audiencia escuche, se sitúe y, sobre todo, se pregunte por las costuras que sostienen la vida en común.
+        In short, interviewing him — even through an inspired character — allows us to speak of peace from those who knew its fragility. That the audience listens, situates themselves, and above all, wonders about the seams that hold life together.
       </p>
     </div>
   </section>
-  <div class="legend">Pulsa “Siguiente” para avanzar en la entrevista.</div>
+  <div class="legend">Press “Next” to advance the interview.</div>
 
   <!-- Mezcla de ambiente: bunker constante + eventos (explosión / balas) -->
   <audio id="amb_bunker"    src="./assets/Bunker.wav"    preload="auto" loop></audio>
@@ -277,11 +279,11 @@
 
   <dialog id="audioHint">
     <div class="modal-head">
-      <span class="badge">Recomendación</span>
-      <strong>Mejor con audífonos</strong>
+      <span class="badge">Recommendation</span>
+      <strong>Best with headphones</strong>
     </div>
     <div class="modal-body">
-      Para una inmersión total, usa audífonos. ¿Activar el sonido ambiente?
+      For full immersion, use headphones. Activate ambient sound?
     </div>
     <div class="modal-actions">
       <button class="primary" id="audioOkBtn">OK</button>
@@ -290,15 +292,15 @@
 
   <dialog id="modal" style="display:none">
     <div class="modal-head">
-      <span class="badge">Entrevista</span>
-      <strong id="modalTitle">Pregunta</strong>
+      <span class="badge">Interview</span>
+      <strong id="modalTitle">Question</strong>
     </div>
     <div class="modal-body" id="modalBody">
-      Respuesta del personaje…
+      Character's answer…
     </div>
     <div class="modal-actions">
-      <button class="ghost" id="copyBtn" title="Copiar respuesta">Copiar</button>
-      <button class="primary" id="closeBtn">Cerrar</button>
+      <button class="ghost" id="copyBtn" title="Copy answer">Copy</button>
+      <button class="primary" id="closeBtn">Close</button>
     </div>
   </dialog>
 
@@ -322,23 +324,23 @@
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-    const TITLE_LINE = '“Sobrevivir no era una opción… era un acto de fe.”';
+    const TITLE_LINE = '“Surviving was not an option… it was an act of faith.”';
     const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    document.title = `Voces del Frente — ${TITLE_LINE}`;
+    document.title = `Voices from the Front — ${TITLE_LINE}`;
 
     const QUESTIONS = [
-      { q: '¿Dónde estás ahora mismo y qué ves a tu alrededor?', a: 'Estoy bajo tierra, la lámpara zumba y la radio escupe estática. Huele a aceite, cuero mojado y metal. Mis manos están negras de ajustar correas.' },
-      { q: '¿Qué sientes cuando aprietas el casco y escuchas la radio?', a: 'El casco me aprieta la frente, me mantiene aquí. La radio cruje: nombres, coordenadas. El miedo se sienta a mi lado, pero no le doy la palabra.' },
-      { q: '¿En qué piensas al mirar a tus compañeros antes de salir?', a: 'En Collins conteniendo la broma en la comisura, en Parker que guarda una foto doblada. Pienso que esta noche todos somos la misma promesa: volver.' },
-      { q: '¿Qué te sostiene ahora que el ruido crece?', a: 'El peso de la tela en los hombros, el ritual de revisar equipo por última vez, y la certeza de que alguien duerme tranquilo si yo avanzo un paso.' },
-      { q: '¿Qué haces con las cartas de casa en este momento?', a: 'Las guardo dentro de la chaqueta. Leo una línea al azar para no olvidar mi voz. Luego las cierro: afuera hablan otras voces.' },
-      { q: 'Si dudas, ¿qué te dices para seguir?', a: 'Respiro. Cuento hasta tres. Me recuerdo que el valor no grita: respira conmigo y pon el pie donde toca.' },
-      { q: 'Si el futuro te escucha por esta radio, ¿qué mensaje envías?', a: 'Que cuiden la paz como cuidamos el paracaídas: revisen las costuras a diario. Y que nadie tenga que aprender a dormir con botas.' }
+      { q: 'Where are you right now and what do you see around you?', a: 'I am underground, the lamp buzzes and the radio spits static. It smells of oil, wet leather, and metal. My hands are black from adjusting straps.' },
+      { q: 'What do you feel when you tighten your helmet and listen to the radio?', a: 'The helmet presses on my forehead, keeps me here. The radio crackles: names, coordinates. Fear sits beside me, but I don’t give it a word.' },
+      { q: 'What do you think about when you look at your comrades before leaving?', a: 'At Collins holding back a joke at the corner of his mouth, at Parker who keeps a folded photo. I think tonight we all share the same promise: to return.' },
+      { q: 'What keeps you going now that the noise grows?', a: 'The weight of the fabric on my shoulders, the ritual of checking my gear one last time, and the certainty that someone sleeps peacefully if I take one more step.' },
+      { q: 'What do you do with the letters from home right now?', a: 'I keep them inside my jacket. I read a random line so I don’t forget my voice. Then I close them: outside, other voices speak.' },
+      { q: 'If you hesitate, what do you tell yourself to keep going?', a: 'I breathe. I count to three. I remind myself that courage doesn’t shout: breathe with me and put your foot where it belongs.' },
+      { q: 'If the future hears you through this radio, what message do you send?', a: 'Take care of peace as we do with our parachute: check the seams daily. And may no one have to learn to sleep with boots.' }
     ];
     const CONTINUOUS_MODE = false;
     const DIALOGUE_MODE   = true;
-    const INTERVIEWER_NAME = 'Entrevistador';
-    const CHARACTER_NAME   = 'Wallace (Personaje)';
+    const INTERVIEWER_NAME = 'Interviewer';
+    const CHARACTER_NAME   = 'Wallace (Character)';
     const TALK_SPEED = 0.65;
     const TARGET_R3 = 'en collins conteniendo la broma en la comisura, en parker que guarda una foto doblada. pienso que esta noche todos somos la misma promesa: volver.';
     const TARGET_R7 = 'que cuiden la paz como cuidamos el paracaídas: revisen las costuras a diario. y que nadie tenga que aprender a dormir con botas.';
@@ -430,7 +432,7 @@
       ansT.textContent = INTERVIEWER_NAME;
       ansB.textContent = item.q;
       const nb = document.getElementById('nextBtn');
-      if (nb){ nb.disabled = false; nb.style.visibility = 'visible'; nb.textContent = 'Ver respuesta'; }
+      if (nb){ nb.disabled = false; nb.style.visibility = 'visible'; nb.textContent = 'Show answer'; }
     }
 
     function showAnswer(i){
@@ -519,7 +521,7 @@
       }
 
       const nb = document.getElementById('nextBtn');
-      if (nb){ nb.disabled = false; nb.style.visibility = 'visible'; nb.textContent = 'Siguiente'; }
+      if (nb){ nb.disabled = false; nb.style.visibility = 'visible'; nb.textContent = 'Next'; }
     }
 
     function nextQA(){
@@ -582,8 +584,8 @@
     });
     copyBtn.addEventListener('click', async() => {
       await navigator.clipboard.writeText(modalBody.textContent);
-      copyBtn.textContent = 'Copiado';
-      setTimeout(()=> copyBtn.textContent = 'Copiar', 900);
+      copyBtn.textContent = 'Copied';
+      setTimeout(()=> copyBtn.textContent = 'Copy', 900);
     });
 
     function fadeAudio(el, toVol = 1, ms = 800) {
@@ -724,6 +726,36 @@
 
     const canvas = document.getElementById('three');
     const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+
+    // --- Sound Toggle Button Logic ---
+    const soundToggleBtn = document.getElementById('soundToggleBtn');
+    let isMuted = false;
+    function updateSoundToggleBtn() {
+      if (isMuted) {
+        soundToggleBtn.textContent = '🔇 Sound Off';
+        soundToggleBtn.setAttribute('aria-label', 'Unmute all audio');
+        soundToggleBtn.setAttribute('title', 'Unmute all audio');
+      } else {
+        soundToggleBtn.textContent = '🔊 Sound On';
+        soundToggleBtn.setAttribute('aria-label', 'Mute all audio');
+        soundToggleBtn.setAttribute('title', 'Mute all audio');
+      }
+    }
+    function setAllAudioMuted(muted) {
+      document.querySelectorAll('audio').forEach(audio => {
+        audio.muted = muted;
+      });
+    }
+    if (soundToggleBtn) {
+      updateSoundToggleBtn();
+      soundToggleBtn.addEventListener('click', () => {
+        isMuted = !isMuted;
+        setAllAudioMuted(isMuted);
+        updateSoundToggleBtn();
+      });
+    }
+    // On page load, ensure all audio is unmuted by default
+    setAllAudioMuted(false);
     
     const clock = new THREE.Clock();
     if (location.protocol === 'file:') {
@@ -892,14 +924,14 @@
 </html>
   <dialog id="infoDialog">
     <div class="modal-head">
-      <span class="badge">Información</span>
+      <span class="badge">Information</span>
     </div>
     <div class="modal-body">
-      <p>Creada por: David Ramírez Bastida</p>
-      <p>Mentor de periodismo inmersivo: Guillermo Paredes Otero</p>
-      <p>Universidad Anáhuac Oaxaca</p>
+      <p>Created by: David Ramírez Bastida</p>
+      <p>Immersive journalism mentor: Guillermo Paredes Otero</p>
+      <p>Anáhuac University Oaxaca</p>
     </div>
     <div class="modal-actions">
-      <button class="primary" id="closeInfoBtn">Cerrar</button>
+      <button class="primary" id="closeInfoBtn">Close</button>
     </div>
   </dialog>
