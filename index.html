@@ -59,7 +59,7 @@
     #qa{position:relative; overflow:hidden}
     #viewer{position:relative; overflow:hidden}
     #viewer canvas{position:absolute; inset:0; width:100%; height:100%; z-index:3; pointer-events:none}
-    #answerCard{ position:absolute; left:50%; top:9%; transform:translate(-50%,0);
+    #answerCard{ position:absolute; left:50%; bottom:14px; transform:translate(-50%,0);
       width:min(520px, 86%); background:rgba(12,12,12,.72); border:1px solid #3a2f1d; border-radius:16px;
       box-shadow:0 20px 60px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.04);
       padding:14px 16px; text-align:left; backdrop-filter: blur(2px);
@@ -78,18 +78,21 @@
       position:absolute; inset:0; display:grid; place-items:center;
       pointer-events:none;
     }
-    .ring{position:absolute; border-radius:50%; border:1px dashed var(--ring);}
+    .ring{position:absolute; border-radius:50%; border:3px solid rgba(151,116,46,.45); box-shadow:0 0 0 10px rgba(20,18,14,.35), inset 0 0 40px rgba(0,0,0,.5);}
 
     .q{
       pointer-events:auto; position:absolute; width:76px; height:76px; border-radius:999px;
       display:grid; place-items:center; text-align:center; padding:8px;
-      background:radial-gradient(120px 120px at 30% 30%, rgba(255,236,179,.18), rgba(0,0,0,.35));
-      border:1px solid rgba(255,210,120,.35);
-      box-shadow:0 10px 25px rgba(0,0,0,.45), inset 0 0 24px rgba(229,181,103,.12);
-      font-size:.75rem; line-height:1.1rem; cursor:pointer;
+      background:radial-gradient(circle at 50% 38%, #45454c 0 26%, #1b1b1f 58%, #0b0b0d 100%);
+      border:2px solid #97742e;
+      box-shadow:0 10px 25px rgba(0,0,0,.5), inset 0 0 0 6px rgba(0,0,0,.55), inset 0 0 22px rgba(0,0,0,.85);
+      color:#e8c97a; font-weight:600;
+      font-size:.85rem; line-height:1.1rem; cursor:pointer;
       transition:transform .2s ease, box-shadow .2s ease;
       user-select:none;
     }
+    .q.lit{ border-color:#FFD65C; box-shadow:0 0 34px rgba(255,214,92,.75), inset 0 0 0 6px rgba(0,0,0,.4), inset 0 0 22px rgba(255,214,92,.35); color:#ffe9a8; }
+    .q.passed{ border-color:#7fae5a; color:#b7e39a; box-shadow:0 10px 25px rgba(0,0,0,.5), inset 0 0 0 6px rgba(20,40,14,.6), inset 0 0 22px rgba(127,174,90,.35); }
     .q:hover{transform:translateZ(0) scale(1.06); box-shadow:0 16px 36px rgba(0,0,0,.55), inset 0 0 36px rgba(229,181,103,.22)}
 
     dialog{border:none; border-radius:18px; padding:0; background:#0c0c0c; color:var(--ink);
@@ -142,7 +145,35 @@
       position:fixed; bottom:12px; right:12px; font-size:.8rem; opacity:.8; background:rgba(0,0,0,.45);
       padding:8px 10px; border-radius:10px; border:1px solid #2b2416;
     }
-  </style>
+  
+    /* ===== Tablero del interrogatorio (v1) ===== */
+    #qa{ display:flex; flex-direction:column; }
+    #orbitWrap{ position:relative; height:44%; min-height:290px; flex:none; }
+    #puzzleBox{ flex:1; overflow:auto; padding:14px 18px 18px; position:relative; border-top:1px solid #2b2416; background:rgba(8,7,4,.55); }
+    .pz-empty{ color:rgba(243,233,210,.66); font-size:1rem; line-height:1.55; text-align:center; padding-top:26px; }
+    .pz-msg{ font-size:1.05rem; line-height:1.5; padding:16px 6px; text-align:center; }
+    .pz-msg.ok{ color:#b7e39a; } .pz-msg.bad{ color:#ff9d7a; }
+    .pz-retry{ display:block; margin:6px auto 0; background:#FFD65C; color:#191204; border:none; border-radius:10px; padding:11px 26px; font-family:'Oswald',sans-serif; font-weight:700; letter-spacing:.08em; cursor:pointer; }
+    #acertijo{ position:absolute; top:12px; left:50%; transform:translateX(-50%); width:min(93%, 560px); z-index:8;
+      background:rgba(8,6,3,.93); border:1px solid rgba(255,214,92,.55); border-left:6px solid #FFD65C; border-radius:12px; padding:11px 16px; }
+    #acertijo[hidden]{ display:none; }
+    .acertijo-tag{ font-family:'Oswald',sans-serif; font-size:.72rem; letter-spacing:.26em; color:#FFD65C; margin-bottom:4px; }
+    .acertijo-text{ font-size:1.02rem; line-height:1.45; color:#f3e9d2; }
+    .pz-map{ position:relative; height:300px; border:1px solid #3a3220; border-radius:12px; overflow:hidden;
+      background:linear-gradient(160deg, #232a1e, #141a10 70%); }
+    .pz-map svg{ position:absolute; inset:0; width:100%; height:100%; }
+    .pz-pin{ position:absolute; width:27px; height:27px; margin:-24px 0 0 -13px; border-radius:50% 50% 50% 0; transform:rotate(-45deg);
+      background:#c8352a; border:2px solid #ffd9d2; box-shadow:0 8px 18px rgba(0,0,0,.55); cursor:grab; touch-action:none; z-index:4; }
+    .pz-pin:active{ cursor:grabbing; }
+    .pz-hold-wrap{ text-align:center; padding-top:16px; }
+    .pz-hold{ width:158px; height:158px; border-radius:50%; border:3px solid rgba(255,214,92,.5); color:#f3e9d2; cursor:pointer;
+      font-family:'Oswald',sans-serif; letter-spacing:.14em; font-size:.95rem; user-select:none; touch-action:none;
+      background:conic-gradient(#FFD65C 0deg, rgba(255,255,255,.07) 0deg); }
+    .pz-hold span{ pointer-events:none; }
+    .pz-note{ color:rgba(243,233,210,.66); font-size:.92rem; text-align:center; margin-top:12px; line-height:1.5; }
+    @keyframes shk{ 0%{transform:translate(0,0)} 25%{transform:translate(-7px,3px)} 50%{transform:translate(6px,-3px)} 75%{transform:translate(-4px,-2px)} 100%{transform:translate(0,0)} }
+    #viewport.shake{ animation:shk .32s ease; }
+</style>
 </head>
 <body>
   <div class="scrim" aria-hidden="true"></div>
@@ -157,15 +188,23 @@
     <section id="viewport" aria-live="polite">
       <div id="viewer">
         <canvas id="three"></canvas>
+        <div id="acertijo" hidden>
+          <div class="acertijo-tag" id="acertijoTag">THE RIDDLE</div>
+          <div class="acertijo-text" id="acertijoText"></div>
+        </div>
         <div id="answerCard" aria-live="polite">
-          <div class="answer-title" id="ansTitle">Question</div>
-          <div class="answer-body" id="ansBody">Click the button to continue the interview.</div>
-          <button id="nextBtn" class="primary" style="margin-top:8px; display:block;">Next</button>
+          <div class="answer-title" id="ansTitle">STROBEL</div>
+          <div class="answer-body" id="ansBody">He watches you in silence. Choose a chamber.</div>
         </div>
       </div>
       <div id="qa">
-        <div class="orbit" id="orbit">
-          <div class="ring" aria-hidden="true"></div>
+        <div id="orbitWrap">
+          <div class="orbit" id="orbit">
+            <div class="ring" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div id="puzzleBox">
+          <div class="pz-empty">The cylinder is on the table, between you and him.<br>Choose a chamber.</div>
         </div>
       </div>
     </section>
@@ -283,15 +322,8 @@
         b.textContent = String(i+1);
         b.setAttribute('aria-label', `Pregunta ${i+1}: ${item.q}`);
         b.addEventListener('click', ()=>{
-          // Al hacer clic: si no estaba seleccionada, muestra la pregunta; si ya estaba, muestra la respuesta
-          if (qaIndex !== i || phase !== 'q') {
-            qaIndex = i;
-            setQuestion(i);
-            phase = 'q';
-          } else {
-            showAnswer(i);
-            phase = 'a';
-          }
+          if (window.__tambor && window.__tambor.listening) { tamborInput(i); return; }
+          openPuzzle(i);
         });
         orbit.appendChild(b);
       });
@@ -300,7 +332,7 @@
     function layout(){
       ensureQuestionButtons();
 
-      const host = document.getElementById('qa');
+      const host = document.getElementById('orbitWrap');
       const vp = host.getBoundingClientRect();
       const ringEl = document.querySelector('.ring');
       const btnSize = 76;
@@ -335,6 +367,125 @@
 
     layout();
     window.addEventListener('resize', layout);
+
+    // ===== MODO INTERROGATORIO v1: puzzles provisionales =====
+    const acertijoEl = document.getElementById('acertijo');
+    const acertijoTag = document.getElementById('acertijoTag');
+    const acertijoText = document.getElementById('acertijoText');
+    const puzzleBox = document.getElementById('puzzleBox');
+    function strobelDice(linea){
+      const t = document.getElementById('ansTitle'), b = document.getElementById('ansBody');
+      if (t) t.textContent = 'STROBEL';
+      if (b) b.textContent = linea;
+    }
+    function strobelReacciona(){
+      try { const n = 'talk' + (1 + Math.floor(Math.random() * 7)); if (actions[n]) playOnceThenIdle(n, 0.3); } catch(_){ }
+    }
+    const PUZZLES = [
+      { tipo:'mapa',    acertijo:'Show him where your unit waits. Put the pin where they sleep \u2014 if you dare.', orden:'\u201CThe map. Show me. NOW.\u201D' },
+      { tipo:'tambor',  acertijo:'He works the cylinder and watches your hands. Repeat his order \u2014 exactly, or not at all.', orden:'\u201CWatch the cylinder. Remember.\u201D' },
+      { tipo:'aguanta', acertijo:'Do not look away. Whatever he does, hold his stare until the lamp stops swinging.', orden:'\u201CLook at me. Do. Not. Blink.\u201D' },
+    ];
+    function openPuzzle(i){
+      window.__tambor = null;
+      const p = PUZZLES[i % PUZZLES.length];
+      acertijoTag.textContent = 'CHAMBER ' + (i + 1) + ' \u2014 THE RIDDLE';
+      acertijoText.textContent = p.acertijo;
+      acertijoEl.hidden = false;
+      strobelDice(p.orden);
+      if (p.tipo === 'mapa') renderMapa(i);
+      else if (p.tipo === 'tambor') renderTambor(i);
+      else renderAguanta(i);
+    }
+    function resolverPuzzle(i, ok, linea){
+      const btns = orbit.querySelectorAll('button.q');
+      if (ok){
+        if (btns[i]) btns[i].classList.add('passed');
+        strobelReacciona();
+        strobelDice(linea);
+        puzzleBox.innerHTML = '<div class="pz-msg ok">He lets it pass \u2014 for now. Choose another chamber.</div>';
+      } else {
+        strobelDice(linea);
+        puzzleBox.innerHTML = '<div class="pz-msg bad">That was wrong.</div><button class="pz-retry" id="pzRetry">Try again</button>';
+        document.getElementById('pzRetry').addEventListener('click', () => openPuzzle(i));
+      }
+    }
+    // --- Puzzle 1: el mapa (arrastra el pin) ---
+    function renderMapa(i){
+      puzzleBox.innerHTML =
+        '<div class="pz-map" id="pzMap">' +
+        '<svg viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden="true">' +
+        '<path d="M0,8 Q30,14 55,10 T100,16 L100,0 L0,0 Z" fill="#2c3626"/>' +
+        '<path d="M28,60 Q30,44 26,34 Q34,26 44,24" stroke="#5f7f9e" stroke-width="2.4" fill="none" opacity=".8"/>' +
+        '<circle cx="74" cy="18" r="1.7" fill="#e8c97a"/><text x="76.5" y="19.5" fill="#cbbd93" font-size="3.4">SAINTE-M\u00C8RE</text>' +
+        '<circle cx="52" cy="40" r="1.4" fill="#e8c97a"/><text x="54.5" y="41.5" fill="#cbbd93" font-size="3.4">CARENTAN</text>' +
+        '<circle cx="16" cy="26" r="1.4" fill="#e8c97a"/><text x="18.5" y="27.5" fill="#cbbd93" font-size="3.4">THE BEACH</text>' +
+        '</svg>' +
+        '<div class="pz-pin" id="pzPin" style="left:50%; top:88%;"></div>' +
+        '</div>' +
+        '<div class="pz-note">Drag the pin. The empty river bend is a lie that keeps them alive. The town is the truth \u2014 and a death sentence.</div>';
+      const map = document.getElementById('pzMap'), pin = document.getElementById('pzPin');
+      let drag = false;
+      const pos = e => { const r = map.getBoundingClientRect(); return { x:(e.clientX - r.left) / r.width * 100, y:(e.clientY - r.top) / r.height * 100 }; };
+      pin.addEventListener('pointerdown', e => { drag = true; pin.setPointerCapture(e.pointerId); e.preventDefault(); });
+      pin.addEventListener('pointermove', e => { if (!drag) return; const p = pos(e); pin.style.left = Math.max(2, Math.min(98, p.x)) + '%'; pin.style.top = Math.max(5, Math.min(97, p.y)) + '%'; });
+      pin.addEventListener('pointerup', e => {
+        if (!drag) return; drag = false;
+        const p = pos(e);
+        const dRiver = Math.hypot(p.x - 30, p.y - 62), dTown = Math.hypot(p.x - 74, p.y - 30);
+        if (dRiver < 14) resolverPuzzle(i, true, '\u201CThe river\u2026 Fine. We will see if the river agrees with you.\u201D');
+        else if (dTown < 13) resolverPuzzle(i, false, '\u201CSainte-M\u00E8re. You just gave them up. Sit down.\u201D');
+      });
+    }
+    // --- Puzzle 2: el tambor (repite la secuencia) ---
+    function renderTambor(i){
+      puzzleBox.innerHTML = '<div class="pz-msg">Watch the chambers light up. Then repeat his order.</div>';
+      const btns = orbit.querySelectorAll('button.q');
+      const seq = []; while (seq.length < 4) { const n = Math.floor(Math.random() * 7); if (!seq.includes(n)) seq.push(n); }
+      window.__tambor = { seq, pos:0, listening:false, chamber:i };
+      let k = 0;
+      const step = () => {
+        if (k > 0) btns[seq[k - 1]].classList.remove('lit');
+        if (k >= seq.length) {
+          window.__tambor.listening = true;
+          puzzleBox.innerHTML = '<div class="pz-msg">Your turn. Tap the chambers in his order.</div><button class="pz-retry" id="pzStop">Stop</button>';
+          document.getElementById('pzStop').addEventListener('click', () => { window.__tambor = null; puzzleBox.innerHTML = '<div class="pz-msg">He lowers the cylinder. Choose a chamber.</div>'; });
+          return;
+        }
+        btns[seq[k]].classList.add('lit'); k++; setTimeout(step, 560);
+      };
+      setTimeout(step, 700);
+    }
+    function tamborInput(n){
+      const t = window.__tambor; if (!t || !t.listening) return;
+      const btns = orbit.querySelectorAll('button.q');
+      btns[n].classList.add('lit'); setTimeout(() => btns[n].classList.remove('lit'), 240);
+      if (n !== t.seq[t.pos]) { const ch = t.chamber; window.__tambor = null; resolverPuzzle(ch, false, '\u201CWrong chamber. Again \u2014 while you still can.\u201D'); return; }
+      t.pos++;
+      if (t.pos >= t.seq.length) { const ch = t.chamber; window.__tambor = null; resolverPuzzle(ch, true, '\u201CSteady hands. Interesting.\u201D'); }
+    }
+    // --- Puzzle 3: aguanta la mirada (mantén presionado) ---
+    function renderAguanta(i){
+      puzzleBox.innerHTML = '<div class="pz-hold-wrap"><button class="pz-hold" id="pzHold"><span>HOLD HIS STARE</span></button></div><div class="pz-note">Press and hold. He will try to make you let go.</div>';
+      const btn = document.getElementById('pzHold'), vp = document.getElementById('viewport');
+      let start = 0, raf = 0, holding = false, done = false;
+      const DUR = 3800;
+      const shakes = [1100, 2300]; let shakeIdx = 0;
+      const tick = () => {
+        if (!holding || done) return;
+        const el = performance.now() - start;
+        btn.style.background = 'conic-gradient(#FFD65C ' + Math.min(360, el / DUR * 360) + 'deg, rgba(255,255,255,.07) 0deg)';
+        if (shakeIdx < shakes.length && el > shakes[shakeIdx]) { shakeIdx++; vp.classList.remove('shake'); void vp.offsetWidth; vp.classList.add('shake'); }
+        if (el >= DUR) { done = true; resolverPuzzle(i, true, '\u201CYou held. Not bad \u2014 for the enemy.\u201D'); return; }
+        raf = requestAnimationFrame(tick);
+      };
+      const down = e => { e.preventDefault(); if (done) return; holding = true; start = performance.now(); shakeIdx = 0; raf = requestAnimationFrame(tick); };
+      const up = () => { if (!holding || done) return; holding = false; cancelAnimationFrame(raf); resolverPuzzle(i, false, '\u201CThere it is. Fear. Sit down.\u201D'); };
+      btn.addEventListener('pointerdown', down);
+      btn.addEventListener('pointerup', up);
+      btn.addEventListener('pointerleave', up);
+    }
+
 
     let qaIndex = -1;
     let phase = 'idle';
@@ -511,6 +662,8 @@
 
     const canvas = document.getElementById('three');
     const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     const clock = new THREE.Clock();
     if (location.protocol === 'file:') {
@@ -521,6 +674,7 @@
       document.body.appendChild(tip);
     }
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0805);
     function frameObject(camera, object, fitOffset = 1.2){
       const box = new THREE.Box3().setFromObject(object);
       const size = box.getSize(new THREE.Vector3());
@@ -543,6 +697,9 @@
 
     const hemi = new THREE.HemisphereLight(0xffe9c0, 0x111111, 1.1); scene.add(hemi);
     const key = new THREE.DirectionalLight(0xffd6a0, 1.2); key.position.set(2,3,1); scene.add(key);
+    key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
+    Object.assign(key.shadow.camera, { left:-7, right:7, top:7, bottom:-7, far:30 });
     const amb = new THREE.AmbientLight(0xffffff, 0.35);
     scene.add(amb);
 
@@ -602,6 +759,57 @@
     const mat = new THREE.MeshStandardMaterial({ color: 0x6a5f4b, roughness:0.8, metalness:0.05 });
     const dummy = new THREE.Mesh(geo, mat); dummy.position.y = 0.6; scene.add(dummy);
 
+
+    // ===== Entorno 3D básico del búnker (v1): se le irán agregando objetos =====
+    function buildRoom(mbox){
+      const size = mbox.getSize(new THREE.Vector3());
+      const c = mbox.getCenter(new THREE.Vector3());
+      const floorY = mbox.min.y, H = size.y;
+      const W = H * 4.6, D = H * 4.0, wallH = H * 1.8;
+      const room = new THREE.Group();
+      const conc     = new THREE.MeshStandardMaterial({ color:0x35302a, roughness:.96 });
+      const concDark = new THREE.MeshStandardMaterial({ color:0x27231e, roughness:.97 });
+      const wood     = new THREE.MeshStandardMaterial({ color:0x4a3823, roughness:.85 });
+      const woodDark = new THREE.MeshStandardMaterial({ color:0x332619, roughness:.9 });
+      const metal    = new THREE.MeshStandardMaterial({ color:0x2c2f31, roughness:.55, metalness:.65 });
+      function box(w, hh, d, mat, x, y, z, ry){
+        const m = new THREE.Mesh(new THREE.BoxGeometry(w, hh, d), mat);
+        m.position.set(x, y, z); if (ry) m.rotation.y = ry;
+        m.castShadow = true; m.receiveShadow = true; room.add(m); return m;
+      }
+      // Piso y techo
+      box(W, .12, D, concDark, c.x, floorY - .06, c.z);
+      box(W, .12, D, concDark, c.x, floorY + wallH + .06, c.z);
+      // Muro trasero y laterales (el frente queda abierto: ahí está la cámara)
+      box(W, wallH, .12, conc, c.x, floorY + wallH/2, c.z - D/2);
+      box(.12, wallH, D, conc, c.x - W/2, floorY + wallH/2, c.z);
+      box(.12, wallH, D, conc, c.x + W/2, floorY + wallH/2, c.z);
+      // Vigas del techo
+      for (let k = -1; k <= 1; k++) box(W, .09, .16, woodDark, c.x, floorY + wallH - .05, c.z + k * D/4);
+      // Puerta metálica con volante, en el muro trasero a su izquierda
+      const doorX = c.x - W * .26;
+      box(H * .62, H * 1.28, .08, metal, doorX, floorY + H * .64, c.z - D/2 + .1);
+      const wheel = new THREE.Mesh(new THREE.TorusGeometry(H * .11, H * .018, 10, 28), metal);
+      wheel.position.set(doorX, floorY + H * .68, c.z - D/2 + .17); wheel.castShadow = true; room.add(wheel);
+      // Mesa de madera a su izquierda
+      const tx = c.x - H * 1.05, tz = c.z + H * .55;
+      box(H * 1.15, .07, H * .6, wood, tx, floorY + H * .52, tz);
+      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx, sz]) => box(.07, H * .52, .07, woodDark, tx + sx * H * .5, floorY + H * .26, tz + sz * H * .24));
+      // Cajas apiladas a su derecha
+      box(H * .52, H * .52, H * .52, wood,     c.x + H * 1.25, floorY + H * .26, c.z - H * .5);
+      box(H * .44, H * .44, H * .44, woodDark, c.x + H * 1.22, floorY + H * .74, c.z - H * .48, .3);
+      box(H * .40, H * .40, H * .40, wood,     c.x + H * 1.70, floorY + H * .20, c.z - H * .1, -.2);
+      // Lámpara colgante con luz cálida
+      const lampX = c.x + H * .3, lampZ = c.z - H * .2, lampTop = floorY + wallH - .02;
+      const cord = new THREE.Mesh(new THREE.CylinderGeometry(.012, .012, H * .34, 6), metal);
+      cord.position.set(lampX, lampTop - H * .17, lampZ); room.add(cord);
+      const shade = new THREE.Mesh(new THREE.ConeGeometry(H * .16, H * .14, 20, 1, true), metal);
+      shade.position.set(lampX, lampTop - H * .36, lampZ); room.add(shade);
+      const bulb = new THREE.PointLight(0xffb45e, 16, 0, 2);
+      bulb.position.set(lampX, lampTop - H * .44, lampZ); room.add(bulb);
+      scene.add(room);
+    }
+
     const loader = new GLTFLoader();
     loader.load('./assets/personaje.glb', (gltf)=>{
       const model = gltf.scene;
@@ -616,6 +824,7 @@
       model.scale.multiplyScalar(0.88);
       console.log('GLB cargado ✅', {diag});
       model.position.y -= 4;
+      try { buildRoom(new THREE.Box3().setFromObject(model)); } catch(e){ console.warn('room', e); }
 
       mixer = new THREE.AnimationMixer(model);
 
