@@ -120,16 +120,6 @@
       box-shadow:0 40px 120px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04);
       width:min(720px, 92vw);
     }
-    #audioHint{
-      border:2px solid #FFD65C;
-      box-shadow: 0 0 0 3px rgba(255,214,92,.14), 0 36px 120px rgba(0,0,0,.65);
-    }
-    #audioHint .modal-head{
-      background: rgba(255,214,92,.08);
-      border-bottom: 1px solid rgba(255,214,92,.35);
-    }
-    #audioHint .badge{ color:#FFD65C; }
-    #audioHint::backdrop{ background: rgba(0,0,0,.6); backdrop-filter: blur(2px); }
     .modal-head{display:flex; gap:12px; align-items:center; padding:16px; border-bottom:1px solid #2b2416}
     .badge{font-family:"Oswald", sans-serif; text-transform:uppercase; letter-spacing:.08em; color:var(--accent)}
     .modal-body{padding:18px 16px 22px; line-height:1.5}
@@ -188,10 +178,7 @@
   <button id="infoBtn" title="Information" aria-label="Information">
     <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="10" fill="none"/><text x="11" y="16" text-anchor="middle" font-size="14" font-family="Arial, sans-serif" fill="#FFD65C" dominant-baseline="middle">ℹ️</text></svg>
   </button>
-  <button id="soundToggleBtn" title="Mute or unmute all audio" aria-label="Mute or unmute all audio" style="position:fixed;top:18px;right:70px;z-index:2002;background:rgba(20,20,20,.65);border:1px solid #3a2f1d;border-radius:12px;padding:6px 16px;color:#FFD65C;font-size:.98rem;cursor:pointer;font-family:'Special Elite',system-ui,sans-serif;">
-    🔊 Sound On
-  </button>
-  <section id="bio" aria-label="Character Introduction">
+    <section id="bio" aria-label="Character Introduction">
     <div class="bio-card">
       <div class="bio-head">
         <div class="bio-tag">Introduction</div>
@@ -258,15 +245,7 @@
   </section>
   <div class="legend">Press “Next” to advance the interview.</div>
 
-  <!-- Mezcla de ambiente: bunker constante + eventos (explosión / balas) -->
-  <audio id="amb_bunker"    src="./assets/Bunker.wav"    preload="auto" loop></audio>
-  <audio id="amb_explosion" src="./assets/Explotion.wav" preload="auto"></audio>
-  <audio id="amb_balas"     src="./assets/Balas.wav"     preload="auto"></audio>
-  <!-- NUEVO: cama de fondo adicional -->
-  <audio id="amb_bgsonido"  src="./assets/bgsonido.mp3"  preload="auto" loop></audio>
-
-  <!-- Click de radio al abrir pregunta -->
-  <audio id="fx" src="./assets/radio-click.wav" preload="auto"></audio>
+  <!-- Sonido ambiente removido (2026-11-04): quedan solo las voces de las respuestas. -->
 
   <!-- Voces -->
   <audio id="voz_r1" src="./assets/respuesta1.mp3" preload="auto"></audio>
@@ -277,19 +256,7 @@
   <audio id="voz_r6" src="./assets/respuesta6.mp3" preload="auto"></audio>
   <audio id="voz_r7" src="./assets/respuesta7.mp3" preload="auto"></audio>
 
-  <dialog id="audioHint">
-    <div class="modal-head">
-      <span class="badge">Recommendation</span>
-      <strong>Best with headphones</strong>
-    </div>
-    <div class="modal-body">
-      For full immersion, use headphones. Activate ambient sound?
-    </div>
-    <div class="modal-actions">
-      <button class="primary" id="audioOkBtn">OK</button>
-    </div>
-  </dialog>
-
+  
   <dialog id="modal" style="display:none">
     <div class="modal-head">
       <span class="badge">Interview</span>
@@ -442,17 +409,7 @@
       const item = QUESTIONS[i];
       if(!item) return;
 
-      // audio UI + ducking
       stopVoices();
-      try{ fx.currentTime = 0; fx.play(); } catch(_){ }
-      if (ambBunker) {
-        fadeAudio(ambBunker, 0.16, 180);
-        setTimeout(()=>fadeAudio(ambBunker, 0.28, 380), 1000);
-      }
-      if (ambBgsonido) {
-        fadeAudio(ambBgsonido, 0.06, 180);
-        setTimeout(()=>fadeAudio(ambBgsonido, 0.12, 380), 1000);
-      }
 
       // UI: personaje responde
       card.classList.remove('role-interviewer');
@@ -553,28 +510,12 @@
     const modalBody = document.getElementById('modalBody');
     const closeBtn = document.getElementById('closeBtn');
     const copyBtn = document.getElementById('copyBtn');
-    const fx = document.getElementById('fx');
-    const ambBunker    = document.getElementById('amb_bunker');
-    const ambExplosion = document.getElementById('amb_explosion');
-    const ambBalas     = document.getElementById('amb_balas');
-    const ambBgsonido  = document.getElementById('amb_bgsonido');
 
     function openModal(title, body){
       const ansT = document.getElementById('ansTitle');
       const ansB = document.getElementById('ansBody');
       ansT.textContent = title;
       ansB.textContent = body;
-      try{ fx.currentTime = 0; fx.play(); } catch(e){}
-      if (ambBunker) {
-        const normal = 0.28;
-        fadeAudio(ambBunker, 0.16, 220);
-        setTimeout(()=> fadeAudio(ambBunker, normal, 420), 1100);
-      }
-      if (ambBgsonido) {
-        const normalBG = 0.12;
-        fadeAudio(ambBgsonido, 0.06, 220);
-        setTimeout(()=> fadeAudio(ambBgsonido, normalBG, 420), 1100);
-      }
     }
     closeBtn.addEventListener('click', () => modal.close());
     modal.addEventListener('click', (e) => {
@@ -588,123 +529,15 @@
       setTimeout(()=> copyBtn.textContent = 'Copy', 900);
     });
 
-    function fadeAudio(el, toVol = 1, ms = 800) {
-      if (!el) return;
-      const from = el.volume ?? 0;
-      const start = performance.now();
-      function step(t) {
-        const k = Math.min(1, (t - start) / ms);
-        el.volume = from + (toVol - from) * k;
-        if (k < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    }
-
-    function startAmbience() {
-      try {
-        if (ambBunker) {
-          ambBunker.volume = 0.0;
-          ambBunker.loop = true;
-          ambBunker.play().then(() => fadeAudio(ambBunker, 0.28, 1500)).catch(()=>{});
-        }
-        if (ambBgsonido) {
-          ambBgsonido.volume = 0.0;
-          ambBgsonido.loop = true;
-          try {
-            const playPromise = ambBgsonido.play();
-            if (playPromise && typeof playPromise.then === 'function') {
-              playPromise.then(() => fadeAudio(ambBgsonido, 0.12, 800)).catch(()=>{});
-            } else {
-              fadeAudio(ambBgsonido, 0.12, 800);
-            }
-          } catch(_) {}
-        }
-        scheduleExplosion();
-        scheduleBalas();
-      } catch(_) {}
-    }
-
-    let tExplosion = null;
-    function scheduleExplosion(){
-      clearTimeout(tExplosion);
-      const next = 18000 + Math.random() * 16000;
-      tExplosion = setTimeout(() => {
-        if (ambExplosion) {
-          ambExplosion.currentTime = 0;
-          ambExplosion.playbackRate = 0.95 + Math.random() * 0.12;
-          ambExplosion.volume = 0.22;
-          ambExplosion.play().catch(()=>{});
-        }
-        scheduleExplosion();
-      }, next);
-    }
-
-    let tBalas = null;
-    function scheduleBalas(){
-      clearTimeout(tBalas);
-      // En móvil, dispara más seguido porque el volumen y altavoces son más bajos
-      const baseMin = IS_MOBILE ? 6000 : 12000;
-      const baseRnd = IS_MOBILE ? 9000 : 14000;
-      const next = baseMin + Math.random() * baseRnd;
-
-      tBalas = setTimeout(async () => {
-        if (!ambBalas) return scheduleBalas();
-        const bursts = (IS_MOBILE ? 2 : 1) + Math.floor(Math.random() * (IS_MOBILE ? 3 : 2));
-        for (let i=0;i<bursts;i++){
-          try{
-            ambBalas.currentTime = 0;
-            ambBalas.playbackRate = 0.98 + Math.random() * 0.08;
-            // Subimos volumen en móvil para que sea perceptible en altavoces de celular
-            ambBalas.volume = IS_MOBILE ? 0.035 : 0.012;
-            const p = ambBalas.play();
-            if (p && typeof p.catch === 'function') p.catch(()=>{});
-          } catch(_) {}
-          // Pausas cortas entre ráfagas
-          await new Promise(r=>setTimeout(r, IS_MOBILE ? (140 + Math.random()*180) : (180 + Math.random()*220)));
-        }
-        scheduleBalas();
-      }, next);
-    }
-
-    let ambienceStarted = false;
-    const audioHint = document.getElementById('audioHint');
-    const audioOkBtn = document.getElementById('audioOkBtn');
-
-    const _startAmbience = startAmbience;
-    function safeStartAmbience(){
-      if (ambienceStarted) return; ambienceStarted = true; _startAmbience();
-    }
-
     window.addEventListener('DOMContentLoaded', () => {
       setVoicesVolume(0.86);
-      if (!sessionStorage.getItem('audioHintShown')){
-        if (audioHint && typeof audioHint.showModal === 'function') audioHint.showModal();
-        else if(audioHint) audioHint.setAttribute('open','');
-      }
     });
 
-    if (audioOkBtn) audioOkBtn.addEventListener('click', () => {
-      sessionStorage.setItem('audioHintShown', '1');
-      if (audioHint) audioHint.close();
-      safeStartAmbience();
-    });
-
-    // Intento de reproducir bgsonido lo antes posible
-    try {
-      if (ambBgsonido) {
-        ambBgsonido.volume = 0.0;
-        ambBgsonido.loop = true;
-        ambBgsonido.play().then(() => fadeAudio(ambBgsonido, 0.12, 1000)).catch(()=>{});
-      }
-    } catch(_) {}
-    window.removeEventListener('pointerdown', startAmbience, { once:true });
-    window.addEventListener('pointerdown', safeStartAmbience, { once:true });
     if (CONTINUOUS_MODE) window.addEventListener('pointerdown', startInterview, { once:true });
 
     const nextBtn = document.getElementById('nextBtn');
     if (nextBtn) nextBtn.addEventListener('click', () => {
       stopVoices();
-      if (!ambienceStarted) safeStartAmbience();
       if (phase === 'idle'){
         qaIndex = (qaIndex + 1) % QUESTIONS.length;
         setQuestion(qaIndex);
@@ -727,36 +560,6 @@
     const canvas = document.getElementById('three');
     const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
 
-    // --- Sound Toggle Button Logic ---
-    const soundToggleBtn = document.getElementById('soundToggleBtn');
-    let isMuted = false;
-    function updateSoundToggleBtn() {
-      if (isMuted) {
-        soundToggleBtn.textContent = '🔇 Sound Off';
-        soundToggleBtn.setAttribute('aria-label', 'Unmute all audio');
-        soundToggleBtn.setAttribute('title', 'Unmute all audio');
-      } else {
-        soundToggleBtn.textContent = '🔊 Sound On';
-        soundToggleBtn.setAttribute('aria-label', 'Mute all audio');
-        soundToggleBtn.setAttribute('title', 'Mute all audio');
-      }
-    }
-    function setAllAudioMuted(muted) {
-      document.querySelectorAll('audio').forEach(audio => {
-        audio.muted = muted;
-      });
-    }
-    if (soundToggleBtn) {
-      updateSoundToggleBtn();
-      soundToggleBtn.addEventListener('click', () => {
-        isMuted = !isMuted;
-        setAllAudioMuted(isMuted);
-        updateSoundToggleBtn();
-      });
-    }
-    // On page load, ensure all audio is unmuted by default
-    setAllAudioMuted(false);
-    
     const clock = new THREE.Clock();
     if (location.protocol === 'file:') {
       console.warn('Estás abriendo el archivo con file:// — inicia un servidor local para cargar GLB (python3 -m http.server 5500)');
