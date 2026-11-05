@@ -189,6 +189,12 @@
     #langSwitch button{ background:rgba(8,6,3,.85); color:#cbbd93; border:1px solid rgba(255,214,92,.45); border-radius:8px; padding:6px 12px;
       font-family:'Oswald',sans-serif; letter-spacing:.12em; font-size:.8rem; cursor:pointer; }
     #langSwitch button.active{ background:#FFD65C; color:#191204; font-weight:700; }
+
+    .pz-track{ position:relative; height:54px; margin-top:26px; border:1px solid #3a3220; border-radius:27px; background:linear-gradient(180deg,#191914,#0e0e0b); overflow:hidden; }
+    .pz-zone{ position:absolute; top:0; bottom:0; background:rgba(255,214,92,.38); border-left:2px solid #FFD65C; border-right:2px solid #FFD65C; }
+    .pz-marker{ position:absolute; top:4px; bottom:4px; width:10px; margin-left:-5px; border-radius:5px; background:#ff5a47; box-shadow:0 0 14px rgba(255,90,71,.85); }
+    .pz-stop{ display:block; margin:20px auto 0; background:#c8352a; color:#ffe9e2; border:1px solid #7e1d13; border-radius:12px; padding:13px 40px;
+      font-family:'Oswald',sans-serif; font-weight:700; letter-spacing:.14em; font-size:1.02rem; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -342,7 +348,7 @@
         b.textContent = String(i+1);
         b.setAttribute('aria-label', `Pregunta ${i+1}: ${item.q}`);
         b.addEventListener('click', ()=>{
-          if (window.__tambor && window.__tambor.listening) { tamborInput(i); return; }
+          if (window.__seq && window.__seq.listening) { memoriaInput(i); return; }
           openPuzzle(i);
         });
         orbit.appendChild(b);
@@ -397,7 +403,7 @@
         tagMachine: n => 'PUZZLE ' + n + ' \u2014 HIS MACHINE',
         tagRiddle: n => 'PUZZLE ' + n + ' \u2014 THE RIDDLE',
         spinIntro: 'Before the riddle, his machine decides how cruel it will be. Pull the lever.',
-        spinLine: '\u201CSpin it. Let us see how lucky the enemy is tonight.\u201D',
+        spinLine: '\u201CSpin it. Let us see how lucky you are tonight.\u201D',
         slotHeader: 'HIS MACHINE \u2014 YOUR LUCK, YOUR SENTENCE',
         pull: 'PULL',
         tierLabels: ['NO MATCH \u2014 EASIEST', 'A PAIR \u2014 NORMAL', 'THREE OF A KIND \u2014 HARDEST'],
@@ -405,20 +411,20 @@
         okMsg: 'He lets it pass \u2014 for now. Choose another number.',
         badMsg: 'That was wrong.',
         retry: 'Try again',
-        beach: 'THE BEACH',
-        mapaNote: 'Drag the pin. The empty river bend is a lie that keeps them alive. The town is the truth \u2014 and a death sentence.',
-        mapaWin: '\u201CThe river\u2026 Fine. We will see if the river agrees with you.\u201D',
-        mapaLose: '\u201CSainte-M\u00E8re. You just gave them up. Sit down.\u201D',
+        pulsoNote: 'The light sweeps back and forth. Press STOP when it crosses the golden zone.',
+        pulsoStop: 'STOP',
+        pulsoWin: '\u201CDead center. Steady hands.\u201D',
+        pulsoLose: '\u201COutside. Close does not count.\u201D',
         seqIntro: 'Watch the numbers light up. Then repeat his pattern.',
         seqYourTurn: 'Your turn. Tap the numbers in his pattern.',
         seqStop: 'Stop',
         seqStopped: 'He stops drumming. Choose a number.',
-        seqWin: '\u201CSteady hands. Interesting.\u201D',
-        seqLose: '\u201CWrong number. Again \u2014 while you still can.\u201D',
-        holdBtn: 'HOLD HIS STARE',
-        holdNote: 'Press and hold. He will try to make you let go.',
-        holdWin: '\u201CYou held. Not bad \u2014 for the enemy.\u201D',
-        holdLose: '\u201CThere it is. Fear. Sit down.\u201D'
+        seqWin: '\u201CMemoria perfecta. Anotado.\u201D',
+        seqLose: '\u201CEse no era el patr\u00F3n.\u201D',
+        holdBtn: 'MANT\u00C9N',
+        holdNote: 'Mant\u00E9n presionado hasta que el anillo se cierre. La m\u00E1quina intentar\u00E1 sacudirte.',
+        holdWin: '\u201CAguantaste hasta el final.\u201D',
+        holdLose: '\u201CSoltaste demasiado pronto.\u201D'
       },
       es: {
         title: 'Voces del Frente',
@@ -427,7 +433,7 @@
         tagMachine: n => 'ACERTIJO ' + n + ' \u2014 SU M\u00C1QUINA',
         tagRiddle: n => 'ACERTIJO ' + n + ' \u2014 EL ACERTIJO',
         spinIntro: 'Antes del acertijo, su m\u00E1quina decide qu\u00E9 tan cruel ser\u00E1. Jala la palanca.',
-        spinLine: '\u201CG\u00EDrala. Veamos qu\u00E9 tan suertudo es el enemigo esta noche.\u201D',
+        spinLine: '\u201CG\u00EDrala. Veamos qu\u00E9 tan suerte tienes esta noche.\u201D',
         slotHeader: 'SU M\u00C1QUINA \u2014 TU SUERTE, TU SENTENCIA',
         pull: 'JALAR',
         tierLabels: ['SIN IGUALES \u2014 EL M\u00C1S F\u00C1CIL', 'UN PAR \u2014 NORMAL', 'TRES IGUALES \u2014 EL M\u00C1S DIF\u00CDCIL'],
@@ -435,10 +441,10 @@
         okMsg: 'Lo deja pasar \u2014 por ahora. Elige otro n\u00FAmero.',
         badMsg: 'Eso estuvo mal.',
         retry: 'Intentar de nuevo',
-        beach: 'LA PLAYA',
-        mapaNote: 'Arrastra el pin. La curva vac\u00EDa del r\u00EDo es una mentira que los mantiene vivos. El pueblo es la verdad \u2014 y una sentencia de muerte.',
-        mapaWin: '\u201CEl r\u00EDo\u2026 Est\u00E1 bien. Veremos si el r\u00EDo est\u00E1 de acuerdo contigo.\u201D',
-        mapaLose: '\u201CSainte-M\u00E8re. Acabas de entregarlos. Si\u00E9ntate.\u201D',
+        pulsoNote: 'La luz va y viene. Presiona DETENER cuando cruce la zona dorada.',
+        pulsoStop: 'DETENER',
+        pulsoWin: '\u201CJusto en el centro. Buen pulso.\u201D',
+        pulsoLose: '\u201CAfuera. Cerca no cuenta.\u201D',
         seqIntro: 'Mira c\u00F3mo se iluminan los n\u00FAmeros. Luego repite su patr\u00F3n.',
         seqYourTurn: 'Tu turno. Toca los n\u00FAmeros en su patr\u00F3n.',
         seqStop: 'Detener',
@@ -452,15 +458,15 @@
       }
     };
     const PUZZLES = [
-      { tipo:'mapa',
-        acertijo:{ en:'Show him where your unit waits. Put the pin where they sleep \u2014 if you dare.', es:'Mu\u00E9strale d\u00F3nde espera tu unidad. Pon el pin donde duermen \u2014 si te atreves.' },
-        orden:{ en:'\u201CThe map. Show me. NOW.\u201D', es:'\u201CEl mapa. Mu\u00E9stramelo. AHORA.\u201D' } },
-      { tipo:'tambor',
-        acertijo:{ en:'He drums a pattern on the table and watches your hands. Repeat it \u2014 exactly, or not at all.', es:'Golpea un patr\u00F3n en la mesa y observa tus manos. Rep\u00EDtelo \u2014 exacto, o nada.' },
-        orden:{ en:'\u201CWatch my hands. Remember.\u201D', es:'\u201CMira mis manos. Recuerda.\u201D' } },
+      { tipo:'pulso',
+        acertijo:{ en:'Stop the light inside the golden zone. One try \u2014 timing is everything.', es:'Det\u00E9n la luz dentro de la zona dorada. Un solo intento \u2014 todo es el momento.' },
+        orden:{ en:'\u201CStop it in the gold. If you can.\u201D', es:'\u201CD\u00E9tenla en lo dorado. Si puedes.\u201D' } },
+      { tipo:'memoria',
+        acertijo:{ en:'A pattern will light up. Repeat it exactly \u2014 from memory.', es:'Se iluminar\u00E1 un patr\u00F3n. Rep\u00EDtelo exacto \u2014 de memoria.' },
+        orden:{ en:'\u201CWatch. Remember. Repeat.\u201D', es:'\u201CMira. Recuerda. Repite.\u201D' } },
       { tipo:'aguanta',
-        acertijo:{ en:'Do not look away. Whatever he does, hold his stare until the lamp stops swinging.', es:'No apartes la mirada. Haga lo que haga, aguanta su mirada hasta que la l\u00E1mpara deje de mecerse.' },
-        orden:{ en:'\u201CLook at me. Do. Not. Blink.\u201D', es:'\u201CM\u00EDrame. No. Parpadees.\u201D' } },
+        acertijo:{ en:'Hold the button until the ring closes. The machine will shake \u2014 do not let go.', es:'Mant\u00E9n el bot\u00F3n hasta que el anillo se cierre. La m\u00E1quina sacudir\u00E1 \u2014 no sueltes.' },
+        orden:{ en:'\u201CHold on. Whatever happens.\u201D', es:'\u201CAguanta. Pase lo que pase.\u201D' } },
     ];
     let LANG = 'en';
     try { LANG = localStorage.getItem('vdf-lang') === 'es' ? 'es' : 'en'; } catch(_){ }
@@ -479,7 +485,7 @@
       try { const n = 'talk' + (1 + Math.floor(Math.random() * 7)); if (actions[n]) playOnceThenIdle(n, 0.3); } catch(_){ }
     }
     function openPuzzle(i){
-      window.__tambor = null;
+      window.__seq = null;
       faseUI = 'slot'; camaraActual = i;
       acertijoTag.textContent = T('tagMachine')(i + 1);
       acertijoText.textContent = T('spinIntro');
@@ -494,8 +500,8 @@
       acertijoTag.textContent = T('tagRiddle')(i + 1);
       acertijoText.textContent = p.acertijo[LANG];
       strobelDice(p.orden[LANG]);
-      if (p.tipo === 'mapa') renderMapa(i, tier);
-      else if (p.tipo === 'tambor') renderTambor(i, tier);
+      if (p.tipo === 'pulso') renderPulso(i, tier);
+      else if (p.tipo === 'memoria') renderMemoria(i, tier);
       else renderAguanta(i, tier);
     }
     // --- Su m\u00E1quina: 3 carretes; cuantos m\u00E1s iguales, m\u00E1s dif\u00EDcil ---
@@ -550,61 +556,60 @@
         document.getElementById('pzRetry').addEventListener('click', () => openPuzzle(i));
       }
     }
-    // --- Puzzle 1: el mapa (arrastra el pin) ---
-    function renderMapa(i, tier){
-      const rRiver = [17, 14, 9][tier || 0], rTown = [11, 13, 16][tier || 0];
+    // --- Puzzle 1: el pulso (det\u00E9n la luz en la zona dorada) ---
+    function renderPulso(i, tier){
+      const anchoZona = [26, 18, 11][tier || 0];
+      const periodo = [2400, 1900, 1500][tier || 0];
+      const centro = 32 + Math.random() * 36;
+      const zL = centro - anchoZona / 2;
       puzzleBox.innerHTML =
-        '<div class="pz-map" id="pzMap">' +
-        '<svg viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden="true">' +
-        '<path d="M0,8 Q30,14 55,10 T100,16 L100,0 L0,0 Z" fill="#2c3626"/>' +
-        '<path d="M28,60 Q30,44 26,34 Q34,26 44,24" stroke="#5f7f9e" stroke-width="2.4" fill="none" opacity=".8"/>' +
-        '<circle cx="74" cy="18" r="1.7" fill="#e8c97a"/><text x="76.5" y="19.5" fill="#cbbd93" font-size="3.4">SAINTE-M\u00C8RE</text>' +
-        '<circle cx="52" cy="40" r="1.4" fill="#e8c97a"/><text x="54.5" y="41.5" fill="#cbbd93" font-size="3.4">CARENTAN</text>' +
-        '<circle cx="16" cy="26" r="1.4" fill="#e8c97a"/><text x="18.5" y="27.5" fill="#cbbd93" font-size="3.4">' + T('beach') + '</text>' +
-        '</svg>' +
-        '<div class="pz-pin" id="pzPin" style="left:50%; top:88%;"></div>' +
-        '</div>' +
-        '<div class="pz-note">' + T('mapaNote') + '</div>';
-      const map = document.getElementById('pzMap'), pin = document.getElementById('pzPin');
-      let drag = false;
-      const pos = e => { const r = map.getBoundingClientRect(); return { x:(e.clientX - r.left) / r.width * 100, y:(e.clientY - r.top) / r.height * 100 }; };
-      pin.addEventListener('pointerdown', e => { drag = true; pin.setPointerCapture(e.pointerId); e.preventDefault(); });
-      pin.addEventListener('pointermove', e => { if (!drag) return; const p = pos(e); pin.style.left = Math.max(2, Math.min(98, p.x)) + '%'; pin.style.top = Math.max(5, Math.min(97, p.y)) + '%'; });
-      pin.addEventListener('pointerup', e => {
-        if (!drag) return; drag = false;
-        const p = pos(e);
-        const dRiver = Math.hypot(p.x - 30, p.y - 62), dTown = Math.hypot(p.x - 74, p.y - 30);
-        if (dRiver < rRiver) resolverPuzzle(i, true, T('mapaWin'));
-        else if (dTown < rTown) resolverPuzzle(i, false, T('mapaLose'));
+        '<div class="pz-track" id="pzTrack"><div class="pz-zone" style="left:' + zL + '%; width:' + anchoZona + '%;"></div><div class="pz-marker" id="pzMarker"></div></div>' +
+        '<button class="pz-stop" id="pzStopBtn">' + T('pulsoStop') + '</button>' +
+        '<div class="pz-note">' + T('pulsoNote') + '</div>';
+      const marker = document.getElementById('pzMarker');
+      let pos = 0, detenido = false;
+      const t0 = performance.now();
+      const tick = now => {
+        if (detenido) return;
+        const f = ((now - t0) % (periodo * 2)) / periodo;
+        pos = f <= 1 ? f * 100 : (2 - f) * 100;
+        marker.style.left = pos + '%';
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+      document.getElementById('pzStopBtn').addEventListener('click', () => {
+        if (detenido) return; detenido = true;
+        if (pos >= zL && pos <= zL + anchoZona) resolverPuzzle(i, true, T('pulsoWin'));
+        else resolverPuzzle(i, false, T('pulsoLose'));
       });
     }
     // --- Puzzle 2: la secuencia (repite su patr\u00F3n) ---
-    function renderTambor(i, tier){
+    function renderMemoria(i, tier){
       const seqLen = [3, 4, 5][tier || 0], vel = [640, 560, 460][tier || 0];
       puzzleBox.innerHTML = '<div class="pz-msg">' + T('seqIntro') + '</div>';
       const btns = orbit.querySelectorAll('button.q');
       const seq = []; while (seq.length < seqLen) { const n = Math.floor(Math.random() * 7); if (!seq.includes(n)) seq.push(n); }
-      window.__tambor = { seq, pos:0, listening:false, idx:i };
+      window.__seq = { seq, pos:0, listening:false, idx:i };
       let k = 0;
       const step = () => {
         if (k > 0) btns[seq[k - 1]].classList.remove('lit');
         if (k >= seq.length) {
-          window.__tambor.listening = true;
+          window.__seq.listening = true;
           puzzleBox.innerHTML = '<div class="pz-msg">' + T('seqYourTurn') + '</div><button class="pz-retry" id="pzStop">' + T('seqStop') + '</button>';
-          document.getElementById('pzStop').addEventListener('click', () => { window.__tambor = null; puzzleBox.innerHTML = '<div class="pz-msg">' + T('seqStopped') + '</div>'; });
+          document.getElementById('pzStop').addEventListener('click', () => { window.__seq = null; puzzleBox.innerHTML = '<div class="pz-msg">' + T('seqStopped') + '</div>'; });
           return;
         }
         btns[seq[k]].classList.add('lit'); k++; setTimeout(step, vel);
       };
       setTimeout(step, 700);
     }
-    function tamborInput(n){
-      const t = window.__tambor; if (!t || !t.listening) return;
+    function memoriaInput(n){
+      const t = window.__seq; if (!t || !t.listening) return;
       const btns = orbit.querySelectorAll('button.q');
       btns[n].classList.add('lit'); setTimeout(() => btns[n].classList.remove('lit'), 240);
-      if (n !== t.seq[t.pos]) { const ch = t.idx; window.__tambor = null; resolverPuzzle(ch, false, T('seqLose')); return; }
+      if (n !== t.seq[t.pos]) { const ch = t.idx; window.__seq = null; resolverPuzzle(ch, false, T('seqLose')); return; }
       t.pos++;
-      if (t.pos >= t.seq.length) { const ch = t.idx; window.__tambor = null; resolverPuzzle(ch, true, T('seqWin')); }
+      if (t.pos >= t.seq.length) { const ch = t.idx; window.__seq = null; resolverPuzzle(ch, true, T('seqWin')); }
     }
     // --- Puzzle 3: aguanta la mirada (mant\u00E9n presionado) ---
     function renderAguanta(i, tier){
