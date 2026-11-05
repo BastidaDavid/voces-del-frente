@@ -236,31 +236,7 @@
     </section>
   </main>
 
-  <section class="news" aria-label="The Interviewee — Newspaper-style Section">
-    <div class="news-kicker">Profile</div>
-    <h2 class="news-headline">Wallace C. Strobel</h2>
-    <div class="news-dek">101st Airborne Division News</div>
-    <div class="news-meta">
-      <span class="byline">June 2, 1944</span>
-    </div>
-    <div class="news-columns">
-      <p class="dropcap">
-        Wallace C. Strobel, whose face inspires our fictional character, appears in the preparations before D-Day. In this experience, his figure allows us to respectfully explore the memory of thousands of young people who faced uncertainty and fear in World War II.
-      </p>
-      <p>
-        His image captures a powerful human tension: the moment before everything changes. That threshold — between the calm of the bunker and the roar outside — opens a narrative territory to talk about responsibility, camaraderie, and the weight of decisions.
-      </p>
-      <p>
-        The interview seeks to avoid the spectacle of combat to focus on the intimate: routines, objects, voices, and breathing. The helmet pressing, the crackling radio, a folded letter in the pocket; small anchors so that the memory is believable and close.
-      </p>
-      <p>
-        It is also a pedagogical opportunity: to show how immersive journalism can build empathy without glorifying war, using sound, spatial resources, and a 3D staging that accompanies — but does not replace — the testimony.
-      </p>
-      <p>
-        In short, interviewing him — even through an inspired character — allows us to speak of peace from those who knew its fragility. That the audience listens, situates themselves, and above all, wonders about the seams that hold life together.
-      </p>
-    </div>
-  </section>
+
 
   <!-- Sonido ambiente removido (2026-11-04): quedan solo las voces de las respuestas. -->
 
@@ -989,7 +965,17 @@
       model.scale.multiplyScalar(0.88);
       console.log('GLB cargado ✅', {diag});
       model.position.y -= 4;
-      try { buildRoom(new THREE.Box3().setFromObject(model)); } catch(e){ console.warn('room', e); }
+      try {
+        model.updateWorldMatrix(true, true);
+        const boneBox = new THREE.Box3();
+        const bv = new THREE.Vector3();
+        model.traverse(o => { if (o.isBone) boneBox.expandByPoint(o.getWorldPosition(bv)); });
+        if (boneBox.isEmpty()) boneBox.setFromObject(model);
+        const bh = boneBox.max.y - boneBox.min.y;
+        boneBox.max.y += bh * 0.10;
+        boneBox.min.y -= bh * 0.05;
+        buildRoom(boneBox);
+      } catch(e){ console.warn('room', e); }
 
       mixer = new THREE.AnimationMixer(model);
 
