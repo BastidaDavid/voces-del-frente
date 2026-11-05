@@ -171,6 +171,18 @@
       background:conic-gradient(#FFD65C 0deg, rgba(255,255,255,.07) 0deg); }
     .pz-hold span{ pointer-events:none; }
     .pz-note{ color:rgba(243,233,210,.66); font-size:.92rem; text-align:center; margin-top:12px; line-height:1.5; }
+
+    /* ===== Su máquina: 3 carretes fijan la dificultad ===== */
+    .slot{ text-align:center; padding-top:12px; }
+    .slot-reels{ display:flex; gap:12px; justify-content:center; margin:16px 0 6px; }
+    .slot-reel{ width:86px; height:96px; border-radius:12px; border:2px solid #97742e; background:linear-gradient(180deg,#1d1d21,#0c0c0e);
+      display:grid; place-items:center; font-size:2.6rem; color:#FFD65C; box-shadow:inset 0 0 24px rgba(0,0,0,.8); font-family:'Oswald',sans-serif; }
+    .slot-reel.stop{ border-color:#FFD65C; box-shadow:0 0 22px rgba(255,214,92,.35), inset 0 0 24px rgba(0,0,0,.8); }
+    .slot-pull{ margin-top:12px; background:#c8352a; color:#ffe9e2; border:1px solid #7e1d13; border-radius:12px; padding:13px 34px;
+      font-family:'Oswald',sans-serif; font-weight:700; letter-spacing:.14em; font-size:1.02rem; cursor:pointer; }
+    .slot-pull:disabled{ opacity:.45; cursor:default; }
+    .slot-tier{ margin-top:14px; font-family:'Oswald',sans-serif; letter-spacing:.2em; font-size:1rem; min-height:1.4em; }
+    .slot-tier.t0{ color:#b7e39a; } .slot-tier.t1{ color:#FFD65C; } .slot-tier.t2{ color:#ff9d7a; }
     @keyframes shk{ 0%{transform:translate(0,0)} 25%{transform:translate(-7px,3px)} 50%{transform:translate(6px,-3px)} 75%{transform:translate(-4px,-2px)} 100%{transform:translate(0,0)} }
     #viewport.shake{ animation:shk .32s ease; }
 </style>
@@ -388,14 +400,63 @@
     ];
     function openPuzzle(i){
       window.__tambor = null;
+      acertijoTag.textContent = 'CHAMBER ' + (i + 1) + ' \u2014 HIS MACHINE';
+      acertijoText.textContent = 'Before the riddle, his machine decides how cruel it will be. Pull the lever.';
+      acertijoEl.hidden = false;
+      strobelDice('\u201CSpin it. Let us see how lucky the enemy is tonight.\u201D');
+      renderSlot(i);
+    }
+    function abrirPuzzleConTier(i, tier){
+      window.__tierActual = tier;
       const p = PUZZLES[i % PUZZLES.length];
       acertijoTag.textContent = 'CHAMBER ' + (i + 1) + ' \u2014 THE RIDDLE';
       acertijoText.textContent = p.acertijo;
-      acertijoEl.hidden = false;
       strobelDice(p.orden);
-      if (p.tipo === 'mapa') renderMapa(i);
-      else if (p.tipo === 'tambor') renderTambor(i);
-      else renderAguanta(i);
+      if (p.tipo === 'mapa') renderMapa(i, tier);
+      else if (p.tipo === 'tambor') renderTambor(i, tier);
+      else renderAguanta(i, tier);
+    }
+    // --- Su máquina: 3 carretes; cuantos más iguales, más difícil ---
+    function renderSlot(i){
+      puzzleBox.innerHTML =
+        '<div class="slot"><div style="font-family:\'Oswald\',sans-serif; letter-spacing:.24em; font-size:.85rem; color:rgba(243,233,210,.75);">HIS MACHINE \u2014 YOUR LUCK, YOUR SENTENCE</div>' +
+        '<div class="slot-reels"><div class="slot-reel" id="sr0">?</div><div class="slot-reel" id="sr1">?</div><div class="slot-reel" id="sr2">?</div></div>' +
+        '<button class="slot-pull" id="slotPull">PULL</button>' +
+        '<div class="slot-tier" id="slotTier"></div></div>';
+      const SYMS = ['\u2605','\u2666','\u25CF','\u25B2'];
+      const reels = [0,1,2].map(k => document.getElementById('sr' + k));
+      const tierEl = document.getElementById('slotTier');
+      document.getElementById('slotPull').addEventListener('click', () => {
+        const pull = document.getElementById('slotPull');
+        pull.disabled = true;
+        // Resultado ponderado: 3 iguales 18% · un par 44% · ninguno 38%
+        const r = Math.random(); const fin = [];
+        if (r < 0.18) { const s = SYMS[Math.floor(Math.random() * SYMS.length)]; fin.push(s, s, s); }
+        else if (r < 0.62) {
+          const s = SYMS[Math.floor(Math.random() * SYMS.length)];
+          let o = SYMS[Math.floor(Math.random() * SYMS.length)]; if (o === s) o = SYMS[(SYMS.indexOf(s) + 1) % SYMS.length];
+          const pairPos = [0,1,2].filter(k => k !== Math.floor(Math.random() * 3));
+          [0,1,2].forEach(k => fin.push(pairPos.includes(k) ? s : o));
+        } else {
+          const pool = [...SYMS].sort(() => Math.random() - .5); fin.push(pool[0], pool[1], pool[2]);
+        }
+        reels.forEach((reel, k) => {
+          reel.classList.remove('stop');
+          const iv = setInterval(() => { reel.textContent = SYMS[Math.floor(Math.random() * SYMS.length)]; }, 70);
+          setTimeout(() => { clearInterval(iv); reel.textContent = fin[k]; reel.classList.add('stop'); }, 550 + k * 320);
+        });
+        setTimeout(() => {
+          const counts = {}; fin.forEach(s => counts[s] = (counts[s] || 0) + 1);
+          const maxEq = Math.max(...Object.values(counts));
+          const tier = maxEq === 3 ? 2 : (maxEq === 2 ? 1 : 0);
+          const label = ['NO MATCH \u2014 EASIEST', 'A PAIR \u2014 NORMAL', 'THREE OF A KIND \u2014 HARDEST'][tier];
+          tierEl.textContent = label; tierEl.className = 'slot-tier t' + tier;
+          strobelDice(['\u201CNothing matches. Even his machine is bored with you. Move.\u201D',
+                       '\u201CA pair. He shrugs and waits.\u201D',
+                       '\u201CThree of a kind. He smiles. That is never good.\u201D'][tier]);
+          setTimeout(() => abrirPuzzleConTier(i, tier), 1100);
+        }, 550 + 2 * 320 + 120);
+      });
     }
     function resolverPuzzle(i, ok, linea){
       const btns = orbit.querySelectorAll('button.q');
@@ -411,7 +472,8 @@
       }
     }
     // --- Puzzle 1: el mapa (arrastra el pin) ---
-    function renderMapa(i){
+    function renderMapa(i, tier){
+      const rRiver = [17, 14, 9][tier || 0], rTown = [11, 13, 16][tier || 0];
       puzzleBox.innerHTML =
         '<div class="pz-map" id="pzMap">' +
         '<svg viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden="true">' +
@@ -433,15 +495,16 @@
         if (!drag) return; drag = false;
         const p = pos(e);
         const dRiver = Math.hypot(p.x - 30, p.y - 62), dTown = Math.hypot(p.x - 74, p.y - 30);
-        if (dRiver < 14) resolverPuzzle(i, true, '\u201CThe river\u2026 Fine. We will see if the river agrees with you.\u201D');
-        else if (dTown < 13) resolverPuzzle(i, false, '\u201CSainte-M\u00E8re. You just gave them up. Sit down.\u201D');
+        if (dRiver < rRiver) resolverPuzzle(i, true, '\u201CThe river\u2026 Fine. We will see if the river agrees with you.\u201D');
+        else if (dTown < rTown) resolverPuzzle(i, false, '\u201CSainte-M\u00E8re. You just gave them up. Sit down.\u201D');
       });
     }
     // --- Puzzle 2: el tambor (repite la secuencia) ---
-    function renderTambor(i){
+    function renderTambor(i, tier){
+      const seqLen = [3, 4, 5][tier || 0], vel = [640, 560, 460][tier || 0];
       puzzleBox.innerHTML = '<div class="pz-msg">Watch the chambers light up. Then repeat his order.</div>';
       const btns = orbit.querySelectorAll('button.q');
-      const seq = []; while (seq.length < 4) { const n = Math.floor(Math.random() * 7); if (!seq.includes(n)) seq.push(n); }
+      const seq = []; while (seq.length < seqLen) { const n = Math.floor(Math.random() * 7); if (!seq.includes(n)) seq.push(n); }
       window.__tambor = { seq, pos:0, listening:false, chamber:i };
       let k = 0;
       const step = () => {
@@ -452,7 +515,7 @@
           document.getElementById('pzStop').addEventListener('click', () => { window.__tambor = null; puzzleBox.innerHTML = '<div class="pz-msg">He lowers the cylinder. Choose a chamber.</div>'; });
           return;
         }
-        btns[seq[k]].classList.add('lit'); k++; setTimeout(step, 560);
+        btns[seq[k]].classList.add('lit'); k++; setTimeout(step, vel);
       };
       setTimeout(step, 700);
     }
@@ -465,12 +528,12 @@
       if (t.pos >= t.seq.length) { const ch = t.chamber; window.__tambor = null; resolverPuzzle(ch, true, '\u201CSteady hands. Interesting.\u201D'); }
     }
     // --- Puzzle 3: aguanta la mirada (mantén presionado) ---
-    function renderAguanta(i){
+    function renderAguanta(i, tier){
       puzzleBox.innerHTML = '<div class="pz-hold-wrap"><button class="pz-hold" id="pzHold"><span>HOLD HIS STARE</span></button></div><div class="pz-note">Press and hold. He will try to make you let go.</div>';
       const btn = document.getElementById('pzHold'), vp = document.getElementById('viewport');
       let start = 0, raf = 0, holding = false, done = false;
-      const DUR = 3800;
-      const shakes = [1100, 2300]; let shakeIdx = 0;
+      const DUR = [2600, 3800, 5000][tier || 0];
+      const shakes = [[1100], [1100, 2300], [900, 2100, 3400]][tier || 0]; let shakeIdx = 0;
       const tick = () => {
         if (!holding || done) return;
         const el = performance.now() - start;
