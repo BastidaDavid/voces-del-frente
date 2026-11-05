@@ -78,16 +78,15 @@
       position:absolute; inset:0; display:grid; place-items:center;
       pointer-events:none;
     }
-    .ring{position:absolute; border-radius:50%; border:3px solid rgba(151,116,46,.45); box-shadow:0 0 0 10px rgba(20,18,14,.35), inset 0 0 40px rgba(0,0,0,.5);}
+    .ring{position:absolute; border-radius:50%; border:1px dashed var(--ring);}
 
     .q{
       pointer-events:auto; position:absolute; width:76px; height:76px; border-radius:999px;
       display:grid; place-items:center; text-align:center; padding:8px;
-      background:radial-gradient(circle at 50% 38%, #45454c 0 26%, #1b1b1f 58%, #0b0b0d 100%);
-      border:2px solid #97742e;
-      box-shadow:0 10px 25px rgba(0,0,0,.5), inset 0 0 0 6px rgba(0,0,0,.55), inset 0 0 22px rgba(0,0,0,.85);
-      color:#e8c97a; font-weight:600;
-      font-size:.85rem; line-height:1.1rem; cursor:pointer;
+      background:radial-gradient(120px 120px at 30% 30%, rgba(255,236,179,.18), rgba(0,0,0,.35));
+      border:1px solid rgba(255,210,120,.35);
+      box-shadow:0 10px 25px rgba(0,0,0,.45), inset 0 0 24px rgba(229,181,103,.12);
+      font-size:.75rem; line-height:1.1rem; cursor:pointer;
       transition:transform .2s ease, box-shadow .2s ease;
       user-select:none;
     }
@@ -206,7 +205,7 @@
         </div>
         <div id="answerCard" aria-live="polite">
           <div class="answer-title" id="ansTitle">STROBEL</div>
-          <div class="answer-body" id="ansBody">He watches you in silence. Choose a chamber.</div>
+          <div class="answer-body" id="ansBody">He watches you in silence. Choose a number.</div>
         </div>
       </div>
       <div id="qa">
@@ -216,7 +215,7 @@
           </div>
         </div>
         <div id="puzzleBox">
-          <div class="pz-empty">The cylinder is on the table, between you and him.<br>Choose a chamber.</div>
+          <div class="pz-empty">His table. His rules.<br>Choose a number to begin.</div>
         </div>
       </div>
     </section>
@@ -395,12 +394,12 @@
     }
     const PUZZLES = [
       { tipo:'mapa',    acertijo:'Show him where your unit waits. Put the pin where they sleep \u2014 if you dare.', orden:'\u201CThe map. Show me. NOW.\u201D' },
-      { tipo:'tambor',  acertijo:'He works the cylinder and watches your hands. Repeat his order \u2014 exactly, or not at all.', orden:'\u201CWatch the cylinder. Remember.\u201D' },
+      { tipo:'tambor',  acertijo:'He drums a pattern on the table and watches your hands. Repeat it \u2014 exactly, or not at all.', orden:'\u201CWatch my hands. Remember.\u201D' },
       { tipo:'aguanta', acertijo:'Do not look away. Whatever he does, hold his stare until the lamp stops swinging.', orden:'\u201CLook at me. Do. Not. Blink.\u201D' },
     ];
     function openPuzzle(i){
       window.__tambor = null;
-      acertijoTag.textContent = 'CHAMBER ' + (i + 1) + ' \u2014 HIS MACHINE';
+      acertijoTag.textContent = 'PUZZLE ' + (i + 1) + ' \u2014 HIS MACHINE';
       acertijoText.textContent = 'Before the riddle, his machine decides how cruel it will be. Pull the lever.';
       acertijoEl.hidden = false;
       strobelDice('\u201CSpin it. Let us see how lucky the enemy is tonight.\u201D');
@@ -409,7 +408,7 @@
     function abrirPuzzleConTier(i, tier){
       window.__tierActual = tier;
       const p = PUZZLES[i % PUZZLES.length];
-      acertijoTag.textContent = 'CHAMBER ' + (i + 1) + ' \u2014 THE RIDDLE';
+      acertijoTag.textContent = 'PUZZLE ' + (i + 1) + ' \u2014 THE RIDDLE';
       acertijoText.textContent = p.acertijo;
       strobelDice(p.orden);
       if (p.tipo === 'mapa') renderMapa(i, tier);
@@ -464,7 +463,7 @@
         if (btns[i]) btns[i].classList.add('passed');
         strobelReacciona();
         strobelDice(linea);
-        puzzleBox.innerHTML = '<div class="pz-msg ok">He lets it pass \u2014 for now. Choose another chamber.</div>';
+        puzzleBox.innerHTML = '<div class="pz-msg ok">He lets it pass \u2014 for now. Choose another number.</div>';
       } else {
         strobelDice(linea);
         puzzleBox.innerHTML = '<div class="pz-msg bad">That was wrong.</div><button class="pz-retry" id="pzRetry">Try again</button>';
@@ -502,7 +501,7 @@
     // --- Puzzle 2: el tambor (repite la secuencia) ---
     function renderTambor(i, tier){
       const seqLen = [3, 4, 5][tier || 0], vel = [640, 560, 460][tier || 0];
-      puzzleBox.innerHTML = '<div class="pz-msg">Watch the chambers light up. Then repeat his order.</div>';
+      puzzleBox.innerHTML = '<div class="pz-msg">Watch the numbers light up. Then repeat his pattern.</div>';
       const btns = orbit.querySelectorAll('button.q');
       const seq = []; while (seq.length < seqLen) { const n = Math.floor(Math.random() * 7); if (!seq.includes(n)) seq.push(n); }
       window.__tambor = { seq, pos:0, listening:false, chamber:i };
@@ -511,8 +510,8 @@
         if (k > 0) btns[seq[k - 1]].classList.remove('lit');
         if (k >= seq.length) {
           window.__tambor.listening = true;
-          puzzleBox.innerHTML = '<div class="pz-msg">Your turn. Tap the chambers in his order.</div><button class="pz-retry" id="pzStop">Stop</button>';
-          document.getElementById('pzStop').addEventListener('click', () => { window.__tambor = null; puzzleBox.innerHTML = '<div class="pz-msg">He lowers the cylinder. Choose a chamber.</div>'; });
+          puzzleBox.innerHTML = '<div class="pz-msg">Your turn. Tap the numbers in his pattern.</div><button class="pz-retry" id="pzStop">Stop</button>';
+          document.getElementById('pzStop').addEventListener('click', () => { window.__tambor = null; puzzleBox.innerHTML = '<div class="pz-msg">He stops drumming. Choose a number.</div>'; });
           return;
         }
         btns[seq[k]].classList.add('lit'); k++; setTimeout(step, vel);
@@ -523,7 +522,7 @@
       const t = window.__tambor; if (!t || !t.listening) return;
       const btns = orbit.querySelectorAll('button.q');
       btns[n].classList.add('lit'); setTimeout(() => btns[n].classList.remove('lit'), 240);
-      if (n !== t.seq[t.pos]) { const ch = t.chamber; window.__tambor = null; resolverPuzzle(ch, false, '\u201CWrong chamber. Again \u2014 while you still can.\u201D'); return; }
+      if (n !== t.seq[t.pos]) { const ch = t.chamber; window.__tambor = null; resolverPuzzle(ch, false, '\u201CWrong number. Again \u2014 while you still can.\u201D'); return; }
       t.pos++;
       if (t.pos >= t.seq.length) { const ch = t.chamber; window.__tambor = null; resolverPuzzle(ch, true, '\u201CSteady hands. Interesting.\u201D'); }
     }
