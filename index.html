@@ -184,12 +184,17 @@
     .slot-tier.t0{ color:#b7e39a; } .slot-tier.t1{ color:#FFD65C; } .slot-tier.t2{ color:#ff9d7a; }
     @keyframes shk{ 0%{transform:translate(0,0)} 25%{transform:translate(-7px,3px)} 50%{transform:translate(6px,-3px)} 75%{transform:translate(-4px,-2px)} 100%{transform:translate(0,0)} }
     #viewport.shake{ animation:shk .32s ease; }
+
+    #langSwitch{ position:absolute; top:12px; right:12px; z-index:20; display:flex; gap:6px; }
+    #langSwitch button{ background:rgba(8,6,3,.85); color:#cbbd93; border:1px solid rgba(255,214,92,.45); border-radius:8px; padding:6px 12px;
+      font-family:'Oswald',sans-serif; letter-spacing:.12em; font-size:.8rem; cursor:pointer; }
+    #langSwitch button.active{ background:#FFD65C; color:#191204; font-weight:700; }
 </style>
 </head>
 <body>
   <div class="scrim" aria-hidden="true"></div>
   <header>
-    <h1>Voices from the Front</h1>
+    <h1 id="pageTitle">Voices from the Front</h1>
   </header>
   <button id="infoBtn" title="Information" aria-label="Information">
     <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="10" fill="none"/><text x="11" y="16" text-anchor="middle" font-size="14" font-family="Arial, sans-serif" fill="#FFD65C" dominant-baseline="middle">ℹ️</text></svg>
@@ -197,6 +202,10 @@
 
   <main class="stage" aria-label="3D Scene with Questions">
     <section id="viewport" aria-live="polite">
+      <div id="langSwitch" role="group" aria-label="Language / Idioma">
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="es">ES</button>
+      </div>
       <div id="viewer">
         <canvas id="three"></canvas>
         <div id="acertijo" hidden>
@@ -379,7 +388,84 @@
     layout();
     window.addEventListener('resize', layout);
 
-    // ===== MODO INTERROGATORIO v1: puzzles provisionales =====
+    // ===== MODO INTERROGATORIO v1: puzzles provisionales + idiomas EN/ES =====
+    const I18N = {
+      en: {
+        title: 'Voices from the Front',
+        cardDefault: 'He watches you in silence. Choose a number.',
+        emptyDefault: 'His table. His rules.<br>Choose a number to begin.',
+        tagMachine: n => 'PUZZLE ' + n + ' \u2014 HIS MACHINE',
+        tagRiddle: n => 'PUZZLE ' + n + ' \u2014 THE RIDDLE',
+        spinIntro: 'Before the riddle, his machine decides how cruel it will be. Pull the lever.',
+        spinLine: '\u201CSpin it. Let us see how lucky the enemy is tonight.\u201D',
+        slotHeader: 'HIS MACHINE \u2014 YOUR LUCK, YOUR SENTENCE',
+        pull: 'PULL',
+        tierLabels: ['NO MATCH \u2014 EASIEST', 'A PAIR \u2014 NORMAL', 'THREE OF A KIND \u2014 HARDEST'],
+        tierLines: ['\u201CNothing matches. Even his machine is bored with you. Move.\u201D', '\u201CA pair. He shrugs and waits.\u201D', '\u201CThree of a kind. He smiles. That is never good.\u201D'],
+        okMsg: 'He lets it pass \u2014 for now. Choose another number.',
+        badMsg: 'That was wrong.',
+        retry: 'Try again',
+        beach: 'THE BEACH',
+        mapaNote: 'Drag the pin. The empty river bend is a lie that keeps them alive. The town is the truth \u2014 and a death sentence.',
+        mapaWin: '\u201CThe river\u2026 Fine. We will see if the river agrees with you.\u201D',
+        mapaLose: '\u201CSainte-M\u00E8re. You just gave them up. Sit down.\u201D',
+        seqIntro: 'Watch the numbers light up. Then repeat his pattern.',
+        seqYourTurn: 'Your turn. Tap the numbers in his pattern.',
+        seqStop: 'Stop',
+        seqStopped: 'He stops drumming. Choose a number.',
+        seqWin: '\u201CSteady hands. Interesting.\u201D',
+        seqLose: '\u201CWrong number. Again \u2014 while you still can.\u201D',
+        holdBtn: 'HOLD HIS STARE',
+        holdNote: 'Press and hold. He will try to make you let go.',
+        holdWin: '\u201CYou held. Not bad \u2014 for the enemy.\u201D',
+        holdLose: '\u201CThere it is. Fear. Sit down.\u201D'
+      },
+      es: {
+        title: 'Voces del Frente',
+        cardDefault: 'Te observa en silencio. Elige un n\u00FAmero.',
+        emptyDefault: 'Su mesa. Sus reglas.<br>Elige un n\u00FAmero para empezar.',
+        tagMachine: n => 'ACERTIJO ' + n + ' \u2014 SU M\u00C1QUINA',
+        tagRiddle: n => 'ACERTIJO ' + n + ' \u2014 EL ACERTIJO',
+        spinIntro: 'Antes del acertijo, su m\u00E1quina decide qu\u00E9 tan cruel ser\u00E1. Jala la palanca.',
+        spinLine: '\u201CG\u00EDrala. Veamos qu\u00E9 tan suertudo es el enemigo esta noche.\u201D',
+        slotHeader: 'SU M\u00C1QUINA \u2014 TU SUERTE, TU SENTENCIA',
+        pull: 'JALAR',
+        tierLabels: ['SIN IGUALES \u2014 EL M\u00C1S F\u00C1CIL', 'UN PAR \u2014 NORMAL', 'TRES IGUALES \u2014 EL M\u00C1S DIF\u00CDCIL'],
+        tierLines: ['\u201CNada coincide. Hasta su m\u00E1quina se aburri\u00F3 de ti. Mu\u00E9vete.\u201D', '\u201CUn par. Se encoge de hombros y espera.\u201D', '\u201CTres iguales. Sonr\u00EDe. Eso nunca es bueno.\u201D'],
+        okMsg: 'Lo deja pasar \u2014 por ahora. Elige otro n\u00FAmero.',
+        badMsg: 'Eso estuvo mal.',
+        retry: 'Intentar de nuevo',
+        beach: 'LA PLAYA',
+        mapaNote: 'Arrastra el pin. La curva vac\u00EDa del r\u00EDo es una mentira que los mantiene vivos. El pueblo es la verdad \u2014 y una sentencia de muerte.',
+        mapaWin: '\u201CEl r\u00EDo\u2026 Est\u00E1 bien. Veremos si el r\u00EDo est\u00E1 de acuerdo contigo.\u201D',
+        mapaLose: '\u201CSainte-M\u00E8re. Acabas de entregarlos. Si\u00E9ntate.\u201D',
+        seqIntro: 'Mira c\u00F3mo se iluminan los n\u00FAmeros. Luego repite su patr\u00F3n.',
+        seqYourTurn: 'Tu turno. Toca los n\u00FAmeros en su patr\u00F3n.',
+        seqStop: 'Detener',
+        seqStopped: 'Deja de golpear la mesa. Elige un n\u00FAmero.',
+        seqWin: '\u201CManos firmes. Interesante.\u201D',
+        seqLose: '\u201CN\u00FAmero equivocado. Otra vez \u2014 mientras puedas.\u201D',
+        holdBtn: 'AGUANTA SU MIRADA',
+        holdNote: 'Mant\u00E9n presionado. \u00C9l intentar\u00E1 que sueltes.',
+        holdWin: '\u201CAguantaste. Nada mal \u2014 para ser el enemigo.\u201D',
+        holdLose: '\u201CAh\u00ED est\u00E1. Miedo. Si\u00E9ntate.\u201D'
+      }
+    };
+    const PUZZLES = [
+      { tipo:'mapa',
+        acertijo:{ en:'Show him where your unit waits. Put the pin where they sleep \u2014 if you dare.', es:'Mu\u00E9strale d\u00F3nde espera tu unidad. Pon el pin donde duermen \u2014 si te atreves.' },
+        orden:{ en:'\u201CThe map. Show me. NOW.\u201D', es:'\u201CEl mapa. Mu\u00E9stramelo. AHORA.\u201D' } },
+      { tipo:'tambor',
+        acertijo:{ en:'He drums a pattern on the table and watches your hands. Repeat it \u2014 exactly, or not at all.', es:'Golpea un patr\u00F3n en la mesa y observa tus manos. Rep\u00EDtelo \u2014 exacto, o nada.' },
+        orden:{ en:'\u201CWatch my hands. Remember.\u201D', es:'\u201CMira mis manos. Recuerda.\u201D' } },
+      { tipo:'aguanta',
+        acertijo:{ en:'Do not look away. Whatever he does, hold his stare until the lamp stops swinging.', es:'No apartes la mirada. Haga lo que haga, aguanta su mirada hasta que la l\u00E1mpara deje de mecerse.' },
+        orden:{ en:'\u201CLook at me. Do. Not. Blink.\u201D', es:'\u201CM\u00EDrame. No. Parpadees.\u201D' } },
+    ];
+    let LANG = 'en';
+    try { LANG = localStorage.getItem('vdf-lang') === 'es' ? 'es' : 'en'; } catch(_){ }
+    const T = k => I18N[LANG][k];
+    let faseUI = 'idle', camaraActual = -1;
     const acertijoEl = document.getElementById('acertijo');
     const acertijoTag = document.getElementById('acertijoTag');
     const acertijoText = document.getElementById('acertijoText');
@@ -392,35 +478,32 @@
     function strobelReacciona(){
       try { const n = 'talk' + (1 + Math.floor(Math.random() * 7)); if (actions[n]) playOnceThenIdle(n, 0.3); } catch(_){ }
     }
-    const PUZZLES = [
-      { tipo:'mapa',    acertijo:'Show him where your unit waits. Put the pin where they sleep \u2014 if you dare.', orden:'\u201CThe map. Show me. NOW.\u201D' },
-      { tipo:'tambor',  acertijo:'He drums a pattern on the table and watches your hands. Repeat it \u2014 exactly, or not at all.', orden:'\u201CWatch my hands. Remember.\u201D' },
-      { tipo:'aguanta', acertijo:'Do not look away. Whatever he does, hold his stare until the lamp stops swinging.', orden:'\u201CLook at me. Do. Not. Blink.\u201D' },
-    ];
     function openPuzzle(i){
       window.__tambor = null;
-      acertijoTag.textContent = 'PUZZLE ' + (i + 1) + ' \u2014 HIS MACHINE';
-      acertijoText.textContent = 'Before the riddle, his machine decides how cruel it will be. Pull the lever.';
+      faseUI = 'slot'; camaraActual = i;
+      acertijoTag.textContent = T('tagMachine')(i + 1);
+      acertijoText.textContent = T('spinIntro');
       acertijoEl.hidden = false;
-      strobelDice('\u201CSpin it. Let us see how lucky the enemy is tonight.\u201D');
+      strobelDice(T('spinLine'));
       renderSlot(i);
     }
     function abrirPuzzleConTier(i, tier){
       window.__tierActual = tier;
+      faseUI = 'puzzle'; camaraActual = i;
       const p = PUZZLES[i % PUZZLES.length];
-      acertijoTag.textContent = 'PUZZLE ' + (i + 1) + ' \u2014 THE RIDDLE';
-      acertijoText.textContent = p.acertijo;
-      strobelDice(p.orden);
+      acertijoTag.textContent = T('tagRiddle')(i + 1);
+      acertijoText.textContent = p.acertijo[LANG];
+      strobelDice(p.orden[LANG]);
       if (p.tipo === 'mapa') renderMapa(i, tier);
       else if (p.tipo === 'tambor') renderTambor(i, tier);
       else renderAguanta(i, tier);
     }
-    // --- Su máquina: 3 carretes; cuantos más iguales, más difícil ---
+    // --- Su m\u00E1quina: 3 carretes; cuantos m\u00E1s iguales, m\u00E1s dif\u00EDcil ---
     function renderSlot(i){
       puzzleBox.innerHTML =
-        '<div class="slot"><div style="font-family:\'Oswald\',sans-serif; letter-spacing:.24em; font-size:.85rem; color:rgba(243,233,210,.75);">HIS MACHINE \u2014 YOUR LUCK, YOUR SENTENCE</div>' +
+        '<div class="slot"><div style="font-family:\'Oswald\',sans-serif; letter-spacing:.24em; font-size:.85rem; color:rgba(243,233,210,.75);">' + T('slotHeader') + '</div>' +
         '<div class="slot-reels"><div class="slot-reel" id="sr0">?</div><div class="slot-reel" id="sr1">?</div><div class="slot-reel" id="sr2">?</div></div>' +
-        '<button class="slot-pull" id="slotPull">PULL</button>' +
+        '<button class="slot-pull" id="slotPull">' + T('pull') + '</button>' +
         '<div class="slot-tier" id="slotTier"></div></div>';
       const SYMS = ['\u2605','\u2666','\u25CF','\u25B2'];
       const reels = [0,1,2].map(k => document.getElementById('sr' + k));
@@ -428,7 +511,6 @@
       document.getElementById('slotPull').addEventListener('click', () => {
         const pull = document.getElementById('slotPull');
         pull.disabled = true;
-        // Resultado ponderado: 3 iguales 18% · un par 44% · ninguno 38%
         const r = Math.random(); const fin = [];
         if (r < 0.18) { const s = SYMS[Math.floor(Math.random() * SYMS.length)]; fin.push(s, s, s); }
         else if (r < 0.62) {
@@ -448,25 +530,23 @@
           const counts = {}; fin.forEach(s => counts[s] = (counts[s] || 0) + 1);
           const maxEq = Math.max(...Object.values(counts));
           const tier = maxEq === 3 ? 2 : (maxEq === 2 ? 1 : 0);
-          const label = ['NO MATCH \u2014 EASIEST', 'A PAIR \u2014 NORMAL', 'THREE OF A KIND \u2014 HARDEST'][tier];
-          tierEl.textContent = label; tierEl.className = 'slot-tier t' + tier;
-          strobelDice(['\u201CNothing matches. Even his machine is bored with you. Move.\u201D',
-                       '\u201CA pair. He shrugs and waits.\u201D',
-                       '\u201CThree of a kind. He smiles. That is never good.\u201D'][tier]);
+          tierEl.textContent = T('tierLabels')[tier]; tierEl.className = 'slot-tier t' + tier;
+          strobelDice(T('tierLines')[tier]);
           setTimeout(() => abrirPuzzleConTier(i, tier), 1100);
         }, 550 + 2 * 320 + 120);
       });
     }
     function resolverPuzzle(i, ok, linea){
+      faseUI = 'resuelto';
       const btns = orbit.querySelectorAll('button.q');
       if (ok){
         if (btns[i]) btns[i].classList.add('passed');
         strobelReacciona();
         strobelDice(linea);
-        puzzleBox.innerHTML = '<div class="pz-msg ok">He lets it pass \u2014 for now. Choose another number.</div>';
+        puzzleBox.innerHTML = '<div class="pz-msg ok">' + T('okMsg') + '</div>';
       } else {
         strobelDice(linea);
-        puzzleBox.innerHTML = '<div class="pz-msg bad">That was wrong.</div><button class="pz-retry" id="pzRetry">Try again</button>';
+        puzzleBox.innerHTML = '<div class="pz-msg bad">' + T('badMsg') + '</div><button class="pz-retry" id="pzRetry">' + T('retry') + '</button>';
         document.getElementById('pzRetry').addEventListener('click', () => openPuzzle(i));
       }
     }
@@ -480,11 +560,11 @@
         '<path d="M28,60 Q30,44 26,34 Q34,26 44,24" stroke="#5f7f9e" stroke-width="2.4" fill="none" opacity=".8"/>' +
         '<circle cx="74" cy="18" r="1.7" fill="#e8c97a"/><text x="76.5" y="19.5" fill="#cbbd93" font-size="3.4">SAINTE-M\u00C8RE</text>' +
         '<circle cx="52" cy="40" r="1.4" fill="#e8c97a"/><text x="54.5" y="41.5" fill="#cbbd93" font-size="3.4">CARENTAN</text>' +
-        '<circle cx="16" cy="26" r="1.4" fill="#e8c97a"/><text x="18.5" y="27.5" fill="#cbbd93" font-size="3.4">THE BEACH</text>' +
+        '<circle cx="16" cy="26" r="1.4" fill="#e8c97a"/><text x="18.5" y="27.5" fill="#cbbd93" font-size="3.4">' + T('beach') + '</text>' +
         '</svg>' +
         '<div class="pz-pin" id="pzPin" style="left:50%; top:88%;"></div>' +
         '</div>' +
-        '<div class="pz-note">Drag the pin. The empty river bend is a lie that keeps them alive. The town is the truth \u2014 and a death sentence.</div>';
+        '<div class="pz-note">' + T('mapaNote') + '</div>';
       const map = document.getElementById('pzMap'), pin = document.getElementById('pzPin');
       let drag = false;
       const pos = e => { const r = map.getBoundingClientRect(); return { x:(e.clientX - r.left) / r.width * 100, y:(e.clientY - r.top) / r.height * 100 }; };
@@ -494,24 +574,24 @@
         if (!drag) return; drag = false;
         const p = pos(e);
         const dRiver = Math.hypot(p.x - 30, p.y - 62), dTown = Math.hypot(p.x - 74, p.y - 30);
-        if (dRiver < rRiver) resolverPuzzle(i, true, '\u201CThe river\u2026 Fine. We will see if the river agrees with you.\u201D');
-        else if (dTown < rTown) resolverPuzzle(i, false, '\u201CSainte-M\u00E8re. You just gave them up. Sit down.\u201D');
+        if (dRiver < rRiver) resolverPuzzle(i, true, T('mapaWin'));
+        else if (dTown < rTown) resolverPuzzle(i, false, T('mapaLose'));
       });
     }
-    // --- Puzzle 2: el tambor (repite la secuencia) ---
+    // --- Puzzle 2: la secuencia (repite su patr\u00F3n) ---
     function renderTambor(i, tier){
       const seqLen = [3, 4, 5][tier || 0], vel = [640, 560, 460][tier || 0];
-      puzzleBox.innerHTML = '<div class="pz-msg">Watch the numbers light up. Then repeat his pattern.</div>';
+      puzzleBox.innerHTML = '<div class="pz-msg">' + T('seqIntro') + '</div>';
       const btns = orbit.querySelectorAll('button.q');
       const seq = []; while (seq.length < seqLen) { const n = Math.floor(Math.random() * 7); if (!seq.includes(n)) seq.push(n); }
-      window.__tambor = { seq, pos:0, listening:false, chamber:i };
+      window.__tambor = { seq, pos:0, listening:false, idx:i };
       let k = 0;
       const step = () => {
         if (k > 0) btns[seq[k - 1]].classList.remove('lit');
         if (k >= seq.length) {
           window.__tambor.listening = true;
-          puzzleBox.innerHTML = '<div class="pz-msg">Your turn. Tap the numbers in his pattern.</div><button class="pz-retry" id="pzStop">Stop</button>';
-          document.getElementById('pzStop').addEventListener('click', () => { window.__tambor = null; puzzleBox.innerHTML = '<div class="pz-msg">He stops drumming. Choose a number.</div>'; });
+          puzzleBox.innerHTML = '<div class="pz-msg">' + T('seqYourTurn') + '</div><button class="pz-retry" id="pzStop">' + T('seqStop') + '</button>';
+          document.getElementById('pzStop').addEventListener('click', () => { window.__tambor = null; puzzleBox.innerHTML = '<div class="pz-msg">' + T('seqStopped') + '</div>'; });
           return;
         }
         btns[seq[k]].classList.add('lit'); k++; setTimeout(step, vel);
@@ -522,13 +602,13 @@
       const t = window.__tambor; if (!t || !t.listening) return;
       const btns = orbit.querySelectorAll('button.q');
       btns[n].classList.add('lit'); setTimeout(() => btns[n].classList.remove('lit'), 240);
-      if (n !== t.seq[t.pos]) { const ch = t.chamber; window.__tambor = null; resolverPuzzle(ch, false, '\u201CWrong number. Again \u2014 while you still can.\u201D'); return; }
+      if (n !== t.seq[t.pos]) { const ch = t.idx; window.__tambor = null; resolverPuzzle(ch, false, T('seqLose')); return; }
       t.pos++;
-      if (t.pos >= t.seq.length) { const ch = t.chamber; window.__tambor = null; resolverPuzzle(ch, true, '\u201CSteady hands. Interesting.\u201D'); }
+      if (t.pos >= t.seq.length) { const ch = t.idx; window.__tambor = null; resolverPuzzle(ch, true, T('seqWin')); }
     }
-    // --- Puzzle 3: aguanta la mirada (mantén presionado) ---
+    // --- Puzzle 3: aguanta la mirada (mant\u00E9n presionado) ---
     function renderAguanta(i, tier){
-      puzzleBox.innerHTML = '<div class="pz-hold-wrap"><button class="pz-hold" id="pzHold"><span>HOLD HIS STARE</span></button></div><div class="pz-note">Press and hold. He will try to make you let go.</div>';
+      puzzleBox.innerHTML = '<div class="pz-hold-wrap"><button class="pz-hold" id="pzHold"><span>' + T('holdBtn') + '</span></button></div><div class="pz-note">' + T('holdNote') + '</div>';
       const btn = document.getElementById('pzHold'), vp = document.getElementById('viewport');
       let start = 0, raf = 0, holding = false, done = false;
       const DUR = [2600, 3800, 5000][tier || 0];
@@ -538,15 +618,33 @@
         const el = performance.now() - start;
         btn.style.background = 'conic-gradient(#FFD65C ' + Math.min(360, el / DUR * 360) + 'deg, rgba(255,255,255,.07) 0deg)';
         if (shakeIdx < shakes.length && el > shakes[shakeIdx]) { shakeIdx++; vp.classList.remove('shake'); void vp.offsetWidth; vp.classList.add('shake'); }
-        if (el >= DUR) { done = true; resolverPuzzle(i, true, '\u201CYou held. Not bad \u2014 for the enemy.\u201D'); return; }
+        if (el >= DUR) { done = true; resolverPuzzle(i, true, T('holdWin')); return; }
         raf = requestAnimationFrame(tick);
       };
       const down = e => { e.preventDefault(); if (done) return; holding = true; start = performance.now(); shakeIdx = 0; raf = requestAnimationFrame(tick); };
-      const up = () => { if (!holding || done) return; holding = false; cancelAnimationFrame(raf); resolverPuzzle(i, false, '\u201CThere it is. Fear. Sit down.\u201D'); };
+      const up = () => { if (!holding || done) return; holding = false; cancelAnimationFrame(raf); resolverPuzzle(i, false, T('holdLose')); };
       btn.addEventListener('pointerdown', down);
       btn.addEventListener('pointerup', up);
       btn.addEventListener('pointerleave', up);
     }
+    // --- Idioma: selector EN/ES con preferencia guardada ---
+    function setLang(l){
+      LANG = (l === 'es') ? 'es' : 'en';
+      try { localStorage.setItem('vdf-lang', LANG); } catch(_){ }
+      document.querySelectorAll('#langSwitch button').forEach(b => b.classList.toggle('active', b.dataset.lang === LANG));
+      const h1 = document.getElementById('pageTitle');
+      if (h1) h1.textContent = T('title');
+      document.title = T('title') + (LANG === 'es' ? ' \u2014 Juego interactivo' : ' \u2014 Interactive Game');
+      if (faseUI === 'slot') renderSlot(camaraActual);
+      else if (faseUI === 'puzzle') abrirPuzzleConTier(camaraActual, window.__tierActual || 0);
+      else if (faseUI === 'idle') {
+        puzzleBox.innerHTML = '<div class="pz-empty">' + T('emptyDefault') + '</div>';
+        strobelDice(T('cardDefault'));
+        acertijoEl.hidden = true;
+      }
+    }
+    document.querySelectorAll('#langSwitch button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+    setLang(LANG);
 
 
     let qaIndex = -1;
