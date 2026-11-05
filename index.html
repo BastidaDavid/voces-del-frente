@@ -47,20 +47,6 @@
       padding-top:76px; padding-bottom:24px; min-height: calc(100vh - 90px);
     }
     #bio{ display:block; margin:140px auto 60px; width:min(1200px, 94vw); }
-    .bio-card{
-      background:rgba(12,12,12,.72); border:1px solid #3a2f1d; border-radius:18px; color:var(--ink);
-      box-shadow:0 30px 90px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.04);
-      padding:18px 18px 16px; backdrop-filter: blur(3px);
-    }
-    .bio-head{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
-    .bio-tag{ font-family:"Oswald", sans-serif; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); }
-    .bio-title{ font-family:"Oswald", sans-serif; font-weight:600; letter-spacing:.02em; font-size:1.25rem; }
-    .bio-grid{ display:grid; grid-template-columns: 1.4fr 1fr; gap:18px; }
-    .bio-lead{ line-height:1.6; }
-    .bio-meta{ display:grid; gap:8px; }
-    .meta-row{ display:flex; justify-content:space-between; gap:12px; padding:8px 10px; background:rgba(0,0,0,.35); border:1px solid #2b2416; border-radius:12px; }
-    .meta-label{ opacity:.85; font-family:"Oswald", sans-serif; letter-spacing:.06em; text-transform:uppercase; }
-    .meta-value{ text-align:right; }
     @media (max-width: 900px){ .bio-grid{ grid-template-columns: 1fr; } }
 
     #viewport{
@@ -93,16 +79,6 @@
       pointer-events:none;
     }
     .ring{position:absolute; border-radius:50%; border:1px dashed var(--ring);}
-    #radioImg{
-      position:absolute;
-      top:50%; left:50%;
-      transform:translate(-50%, -50%);
-      width:160px;
-      height:auto;
-      filter:drop-shadow(0 4px 10px rgba(0,0,0,.55));
-      opacity:0.95;
-      pointer-events:none;
-    }
 
     .q{
       pointer-events:auto; position:absolute; width:76px; height:76px; border-radius:999px;
@@ -172,32 +148,10 @@
   <div class="scrim" aria-hidden="true"></div>
   <header>
     <h1>Voices from the Front</h1>
-    <div class="strap">Immersive Interview — World War II</div>
-    <div class="strap">by David Bastida</div>
   </header>
   <button id="infoBtn" title="Information" aria-label="Information">
     <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="10" fill="none"/><text x="11" y="16" text-anchor="middle" font-size="14" font-family="Arial, sans-serif" fill="#FFD65C" dominant-baseline="middle">ℹ️</text></svg>
   </button>
-    <section id="bio" aria-label="Character Introduction">
-    <div class="bio-card">
-      <div class="bio-head">
-        <div class="bio-tag">Introduction</div>
-        <div class="bio-title">Wallace C. Strobel — historical reference</div>
-      </div>
-      <div class="bio-grid">
-        <p class="bio-lead">
-          This character is <em>inspired</em> by the American paratrooper associated with the pre-D-Day photo.
-          In our story, he narrates memories with a human and reflective tone: the weight of decisions, camaraderie, and dignity in the face of fear.
-        </p>
-        <div class="bio-meta">
-          <div class="meta-row"><span class="meta-label">Unit (fiction)</span><span class="meta-value">101st Airborne · Easy Co.</span></div>
-          <div class="meta-row"><span class="meta-label">Role</span><span class="meta-value">Paratrooper · Field witness</span></div>
-          <div class="meta-row"><span class="meta-label">Tone</span><span class="meta-value">Solemn, empathetic, descriptive</span></div>
-          <div class="meta-row"><span class="meta-label">Elements</span><span class="meta-value">Radio, M1 helmet, M-1942 jacket</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <main class="stage" aria-label="3D Scene with Questions">
     <section id="viewport" aria-live="polite">
@@ -212,7 +166,6 @@
       <div id="qa">
         <div class="orbit" id="orbit">
           <div class="ring" aria-hidden="true"></div>
-          <img src="./assets/radio.png" alt="military radio" id="radioImg" />
         </div>
       </div>
     </section>
